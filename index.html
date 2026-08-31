@@ -1,389 +1,432 @@
-header {
-        background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
-        border: 1px solid #3730a3; border-radius: 12px; padding: 20px; margin-bottom: 24px;
-        display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
-    }
-    .header-title { flex: 1 1 300px; }
-    .header-title h1 { color: var(--primary); font-size: 1.6rem; text-transform: uppercase; margin-bottom: 4px; }
-    .header-title p { color: var(--text-muted); font-size: 0.9rem; }
-    
-    .header-center { flex: 1 1 auto; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .guide-btn, .sync-btn {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;
-        border: none; padding: 12px 20px; border-radius: 8px; font-size: 0.95rem; font-weight: bold;
-        cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s;
-        display: flex; align-items: center; gap: 8px; white-space: nowrap;
-    }
-    .sync-btn { background: linear-gradient(135deg, #059669, #047857); }
-    .guide-btn:hover, .sync-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FFXII Zodiac Age — Master Timeline Tracker & Cloud Sync</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --primary: #f59e0b;
+            --secondary: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --status-done-bg: #064e3b25;
+            --status-done-border: #10b981;
+            --status-partial-bg: #78350f25;
+            --status-partial-border: #f59e0b;
+            --status-locked-bg: #450a0a25;
+            --status-locked-border: #ef4444;
+            --modal-bg: #1e293b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; line-height: 1.5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            border: 1px solid #3730a3; border-radius: 12px; padding: 20px; margin-bottom: 24px;
+            display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .header-title { flex: 1 1 300px; }
+        .header-title h1 { color: var(--primary); font-size: 1.6rem; text-transform: uppercase; margin-bottom: 4px; }
+        .header-title p { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .header-center { flex: 1 1 auto; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .guide-btn, .sync-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;
+            border: none; padding: 12px 20px; border-radius: 8px; font-size: 0.95rem; font-weight: bold;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .sync-btn { background: linear-gradient(135deg, #059669, #047857); }
+        .guide-btn:hover, .sync-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
 
-    .progress-box { flex: 0 1 280px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--card-border); padding: 12px 18px; border-radius: 8px; min-width: 240px; }
-    .progress-box .label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
-    .progress-bar-bg { background: #334155; height: 10px; border-radius: 5px; overflow: hidden; }
-    .progress-bar-fill { background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: 0%; transition: width 0.3s ease; }
+        .progress-box { flex: 0 1 280px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--card-border); padding: 12px 18px; border-radius: 8px; min-width: 240px; }
+        .progress-box .label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .progress-bar-bg { background: #334155; height: 10px; border-radius: 5px; overflow: hidden; }
+        .progress-bar-fill { background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: 0%; transition: width 0.3s ease; }
 
-    .status-legend { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 0.8rem; }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid; }
-    
-    .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
-    .nav-tabs { display: flex; gap: 6px; background: var(--card-bg); padding: 6px; border-radius: 10px; border: 1px solid var(--card-border); flex-wrap: wrap; }
-    .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.88rem; }
-    .tab-btn.active { background: var(--primary); color: #000; }
-    .search-box { flex-grow: 1; max-width: 300px; }
-    .search-box input { width: 100%; padding: 10px 14px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-main); font-size: 0.9rem; outline: none; }
-    
-    .timeline-container { display: flex; flex-direction: column; gap: 14px; position: relative; }
-    .timeline-container::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 3px; background: #334155; z-index: 0; }
-    .timeline-item { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; transition: all 0.2s; }
-    .timeline-item.status-done { border-color: var(--status-done-border); background: var(--status-done-bg); }
-    .timeline-item.status-partial { border-color: var(--status-partial-border); background: var(--status-partial-bg); }
-    .timeline-item.status-locked { border-color: var(--status-locked-border); background: var(--status-locked-bg); }
-    .timeline-header { display: flex; align-items: center; gap: 14px; }
-    .timeline-step-num { min-width: 44px; height: 44px; border-radius: 50%; background: #0f172a; border: 2px solid var(--primary); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.85rem; color: var(--primary); }
-    .timeline-title-area { flex-grow: 1; }
-    .timeline-title { font-size: 1.05rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
-    .timeline-title:hover { color: var(--primary); text-decoration: underline; }
-    .timeline-meta { font-size: 0.82rem; color: var(--text-muted); }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-right: 4px; }
-    .badge-cat-Story { background: #f59e0b20; color: #fbbf24; border: 1px solid #f59e0b40; }
-    .badge-cat-MobHunt { background: #ef444420; color: #f87171; border: 1px solid #ef444440; }
-    .badge-cat-Esper { background: #8b5cf620; color: #a78bfa; border: 1px solid #8b5cf640; }
-    .badge-cat-SideQuest { background: #10b98120; color: #34d399; border: 1px solid #10b98140; }
-    .badge-cat-Missable { background: #ec489920; color: #f472b6; border: 1px solid #ec489940; }
-    .custom-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: #10b981; }
-    .subtasks-box { background: rgba(15, 23, 42, 0.5); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; margin-left: 58px; display: flex; flex-direction: column; gap: 8px; }
-    .subtask-item { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-main); }
-    .subtask-item.subtask-done span { text-decoration: line-through; color: var(--text-muted); }
-    .subtask-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #34d399; }
-    
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 16px; }
-    .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .modal-content { background: var(--modal-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 100%; max-width: 650px; padding: 24px; position: relative; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
-    
-    .guide-modal-content { max-width: 1000px !important; width: 95% !important; height: 90vh !important; padding: 24px; }
-    .guide-modal-body { 
-        flex-grow: 1; margin-top: 16px; border-radius: 8px; padding: 20px;
-        background: #0f172a; border: 1px solid var(--card-border);
-        overflow-y: auto; color: #e2e8f0; font-size: 0.95rem; line-height: 1.6;
-    }
-    .guide-modal-body h3 { color: var(--primary); font-size: 1.3rem; margin: 24px 0 12px 0; border-bottom: 1px solid #334155; padding-bottom: 6px; }
-    .guide-modal-body h3:first-child { margin-top: 0; }
-    .guide-modal-body h4 { color: var(--secondary); font-size: 1.1rem; margin: 16px 0 8px 0; }
-    .guide-modal-body ul { margin-left: 20px; margin-bottom: 16px; }
-    .guide-modal-body li { margin-bottom: 8px; }
-    .guide-modal-body .highlight { color: #fbbf24; font-weight: bold; }
-    .guide-modal-body .danger { color: #ef4444; font-weight: bold; }
-    .guide-modal-body .item { color: #a78bfa; font-weight: bold; }
-    
-    .modal-close { position: absolute; top: 16px; right: 16px; background: #334155; border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; z-index: 10; }
-    .modal-close:hover { background: #ef4444; }
-    
-    .modal-header h2 { color: var(--primary); font-size: 1.4rem; margin-bottom: 6px; }
-    .modal-detail-box { background: #0f172a; border: 1px solid var(--card-border); padding: 14px; border-radius: 8px; margin-top: 14px; font-size: 0.9rem; }
+        .status-legend { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 0.8rem; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid; }
+        
+        .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .nav-tabs { display: flex; gap: 6px; background: var(--card-bg); padding: 6px; border-radius: 10px; border: 1px solid var(--card-border); flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.88rem; }
+        .tab-btn.active { background: var(--primary); color: #000; }
+        .search-box { flex-grow: 1; max-width: 300px; }
+        .search-box input { width: 100%; padding: 10px 14px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-main); font-size: 0.9rem; outline: none; }
+        
+        .timeline-container { display: flex; flex-direction: column; gap: 14px; position: relative; }
+        .timeline-container::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 3px; background: #334155; z-index: 0; }
+        .timeline-item { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; transition: all 0.2s; }
+        .timeline-item.status-done { border-color: var(--status-done-border); background: var(--status-done-bg); }
+        .timeline-item.status-partial { border-color: var(--status-partial-border); background: var(--status-partial-bg); }
+        .timeline-item.status-locked { border-color: var(--status-locked-border); background: var(--status-locked-bg); }
+        .timeline-header { display: flex; align-items: center; gap: 14px; }
+        .timeline-step-num { min-width: 44px; height: 44px; border-radius: 50%; background: #0f172a; border: 2px solid var(--primary); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.85rem; color: var(--primary); }
+        .timeline-title-area { flex-grow: 1; }
+        .timeline-title { font-size: 1.05rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+        .timeline-title:hover { color: var(--primary); text-decoration: underline; }
+        .timeline-meta { font-size: 0.82rem; color: var(--text-muted); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-right: 4px; }
+        .badge-cat-Story { background: #f59e0b20; color: #fbbf24; border: 1px solid #f59e0b40; }
+        .badge-cat-MobHunt { background: #ef444420; color: #f87171; border: 1px solid #ef444440; }
+        .badge-cat-Esper { background: #8b5cf620; color: #a78bfa; border: 1px solid #8b5cf640; }
+        .badge-cat-SideQuest { background: #10b98120; color: #34d399; border: 1px solid #10b98140; }
+        .badge-cat-Missable { background: #ec489920; color: #f472b6; border: 1px solid #ec489940; }
+        .custom-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: #10b981; }
+        .subtasks-box { background: rgba(15, 23, 42, 0.5); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 14px; margin-left: 58px; display: flex; flex-direction: column; gap: 8px; }
+        .subtask-item { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-main); }
+        .subtask-item.subtask-done span { text-decoration: line-through; color: var(--text-muted); }
+        .subtask-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #34d399; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 16px; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--modal-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 100%; max-width: 650px; padding: 24px; position: relative; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        .guide-modal-content { max-width: 1000px !important; width: 95% !important; height: 90vh !important; padding: 24px; }
+        .guide-modal-body { 
+            flex-grow: 1; margin-top: 16px; border-radius: 8px; padding: 20px;
+            background: #0f172a; border: 1px solid var(--card-border);
+            overflow-y: auto; color: #e2e8f0; font-size: 0.95rem; line-height: 1.6;
+        }
+        .guide-modal-body h3 { color: var(--primary); font-size: 1.3rem; margin: 24px 0 12px 0; border-bottom: 1px solid #334155; padding-bottom: 6px; }
+        .guide-modal-body h3:first-child { margin-top: 0; }
+        .guide-modal-body h4 { color: var(--secondary); font-size: 1.1rem; margin: 16px 0 8px 0; }
+        .guide-modal-body ul { margin-left: 20px; margin-bottom: 16px; }
+        .guide-modal-body li { margin-bottom: 8px; }
+        .guide-modal-body .highlight { color: #fbbf24; font-weight: bold; }
+        .guide-modal-body .danger { color: #ef4444; font-weight: bold; }
+        .guide-modal-body .item { color: #a78bfa; font-weight: bold; }
+        
+        .modal-close { position: absolute; top: 16px; right: 16px; background: #334155; border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; z-index: 10; }
+        .modal-close:hover { background: #ef4444; }
+        
+        .modal-header h2 { color: var(--primary); font-size: 1.4rem; margin-bottom: 6px; }
+        .modal-detail-box { background: #0f172a; border: 1px solid var(--card-border); padding: 14px; border-radius: 8px; margin-top: 14px; font-size: 0.9rem; }
 
-    @media (max-width: 850px) {
-        header { flex-direction: column; align-items: stretch; text-align: center; gap: 12px; padding: 16px; }
-        .header-title { flex: none; width: 100%; }
-        .header-center { order: 3; width: 100%; flex-direction: column; }
-        .guide-btn, .sync-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem; }
-        .progress-box { order: 2; width: 100%; flex: none; }
-        .status-legend { justify-content: center; }
-        .guide-modal-content { width: 98% !important; height: 95vh !important; padding: 16px; }
-        .guide-modal-body { padding: 12px; font-size: 0.9rem; }
-    }
-</style>
-        <div class="header-center">
-            <button class="guide-btn" onclick="openGuideModal()">📖 Mở Cẩm Nang</button>
-            <button class="sync-btn" onclick="manualFetchCloud()">☁️ Tải Lại Cloud</button>
-        </div>
-
-        <div class="progress-box">
-            <div class="label">
-                <span>Tiến độ Tổng quan</span>
-                <span id="progress-text">0 / 0 (0%)</span>
+        @media (max-width: 850px) {
+            header { flex-direction: column; align-items: stretch; text-align: center; gap: 12px; padding: 16px; }
+            .header-title { flex: none; width: 100%; }
+            .header-center { order: 3; width: 100%; flex-direction: column; }
+            .guide-btn, .sync-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem; }
+            .progress-box { order: 2; width: 100%; flex: none; }
+            .status-legend { justify-content: center; }
+            .guide-modal-content { width: 98% !important; height: 95vh !important; padding: 16px; }
+            .guide-modal-body { padding: 12px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <h1>FFXII: Master Timeline Tracker</h1>
+                <p>⚡ GitHub Cloud Sync & Cẩm Nang Tích Hợp</p>
+                <div class="status-legend">
+                    <div class="legend-item"><div class="legend-box" style="background:var(--status-done-bg); border-color:var(--status-done-border)"></div> 🟩 <b>Đã Xong</b></div>
+                    <div class="legend-item"><div class="legend-box" style="background:var(--status-partial-bg); border-color:var(--status-partial-border)"></div> 🟨 <b>Đang làm</b></div>
+                    <div class="legend-item"><div class="legend-box" style="background:var(--status-locked-bg); border-color:var(--status-locked-border)"></div> 🟥 <b>Chưa Làm</b></div>
+                </div>
             </div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
-        </div>
-    </header>
+            
+            <div class="header-center">
+                <button class="guide-btn" onclick="openGuideModal()">📖 Mở Cẩm Nang Tích Hợp</button>
+                <button class="sync-btn" onclick="manualFetchCloud()">☁️ Tải Lại Cloud</button>
+            </div>
 
-    <div class="controls">
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('all')">📜 Tất Cả</button>
-            <button class="tab-btn" onclick="switchTab('Side Quest')">📜 Side Quests</button>
-            <button class="tab-btn" onclick="switchTab('Mob Hunt')">🎯 Mob Hunts</button>
-            <button class="tab-btn" onclick="switchTab('Esper')">✨ Espers</button>
-            <button class="tab-btn" onclick="switchTab('Story')">🗺️ Cốt Truyện</button>
+            <div class="progress-box">
+                <div class="label">
+                    <span>Tiến độ Tổng quan</span>
+                    <span id="progress-text">0 / 0 (0%)</span>
+                </div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('all')">📜 Tất Cả</button>
+                <button class="tab-btn" onclick="switchTab('Side Quest')">📜 Side Quests</button>
+                <button class="tab-btn" onclick="switchTab('Mob Hunt')">🎯 Mob Hunts</button>
+                <button class="tab-btn" onclick="switchTab('Esper')">✨ Espers</button>
+                <button class="tab-btn" onclick="switchTab('Story')">🗺️ Cốt Truyện</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm tên, vị trí..." oninput="handleSearch()">
+            </div>
         </div>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm tên, vị trí..." oninput="handleSearch()">
+        <div id="timelineContent" class="timeline-container"></div>
+    </div>
+
+    <!-- Modal Chi tiết Nhiệm Vụ -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModalDirect()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Title</h2>
+                <div id="modalBadges"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
-    <div id="timelineContent" class="timeline-container"></div>
-</div>
 
-<!-- Modal Chi tiết Nhiệm Vụ -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModalDirect()">&times;</button>
-        <div class="modal-header">
-            <h2 id="modalTitle">Title</h2>
-            <div id="modalBadges"></div>
-        </div>
-        <div class="modal-body" id="modalBody"></div>
-    </div>
-</div>
+    <!-- Modal Xem Cẩm Nang -->
+    <div class="modal-overlay" id="guideModalOverlay" onclick="closeGuideModal(event)">
+        <div class="modal-content guide-modal-content">
+            <button class="modal-close" onclick="closeGuideModalDirect()">&times;</button>
+            <div class="modal-header">
+                <h2 style="color:var(--primary); font-size: 1.5rem; margin-bottom: 2px;">📖 Cẩm Nang FFXII Tích Hợp</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Tra cứu nhanh thông tin từ A-Z mà không cần file ngoài!</p>
+            </div>
+            <div class="guide-modal-body">
+                <h3>⚡ Những Nâng Cấp & Thay Đổi Quan Trọng Trên Bản The Zodiac Age</h3>
+                <ul>
+                    <li><span class="highlight">Bỏ hoàn toàn rương cấm (Zodiac Spear):</span> Bạn có thể tự do mở MỌI RƯƠNG BÁU gặp trên đường.</li>
+                    <li><span class="highlight">Hệ thống Dual Job (2 Nghề):</span> Montblanc tại Clan Centrio cho phép Reset/Đổi Nghề 100% miễn phí bất cứ lúc nào.</li>
+                    <li><span class="highlight">Tăng tốc game (Speed Mode 2x / 4x):</span> Di chuyển và farm quái cực nhanh.</li>
+                    <li><span class="highlight">Bản đồ Overlay & Auto-Save:</span> Tự lưu game mỗi khi qua vùng mới.</li>
+                    <li><span class="highlight">Reset quái & rương (1 Zone Respawn):</span> Chạy sang khu vực kế bên rồi quay lại là rương/quái hồi sinh.</li>
+                    <li><span class="highlight">Chế độ thử thách (Trial Mode):</span> Đánh 100 tầng quái, chuyển đồ trộm được vào Story Mode.</li>
+                </ul>
 
-<!-- Modal Xem Cẩm Nang -->
-<div class="modal-overlay" id="guideModalOverlay" onclick="closeGuideModal(event)">
-    <div class="modal-content guide-modal-content">
-        <button class="modal-close" onclick="closeGuideModalDirect()">&times;</button>
-        <div class="modal-header">
-            <h2 style="color:var(--primary); font-size: 1.5rem; margin-bottom: 2px;">📖 Cẩm Nang FFXII Tích Hợp</h2>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Tra cứu nhanh thông tin từ A-Z mà không cần file ngoài!</p>
-        </div>
-        <div class="guide-modal-body">
-            <h3>⚡ Những Nâng Cấp & Thay Đổi Quan Trọng Trên Bản The Zodiac Age</h3>
-            <ul>
-                <li><span class="highlight">Bỏ hoàn toàn rương cấm (Zodiac Spear):</span> Bạn có thể tự do mở MỌI RƯƠNG BÁU gặp trên đường.</li>
-                <li><span class="highlight">Hệ thống Dual Job (2 Nghề):</span> Montblanc tại Clan Centrio cho phép Reset/Đổi Nghề 100% miễn phí bất cứ lúc nào.</li>
-                <li><span class="highlight">Tăng tốc game (Speed Mode 2x / 4x):</span> Di chuyển và farm quái cực nhanh.</li>
-                <li><span class="highlight">Bản đồ Overlay & Auto-Save:</span> Tự lưu game mỗi khi qua vùng mới.</li>
-                <li><span class="highlight">Reset quái & rương (1 Zone Respawn):</span> Chạy sang khu vực kế bên rồi quay lại là rương/quái hồi sinh.</li>
-                <li><span class="highlight">Chế độ thử thách (Trial Mode):</span> Đánh 100 tầng quái, chuyển đồ trộm được vào Story Mode.</li>
-            </ul>
+                <h3>⚠️ Danh Sách Các Mục Dễ Bị Bỏ Lỡ Vĩnh Viễn (Missables List)</h3>
+                <ul>
+                    <li><span class="danger">1. Great Serpentskin:</span> Loot từ Nidhogg (Lhusu Mines). <span class="highlight">TUYỆT ĐỐI KHÔNG BÁN!</span> Dùng cho Quest Desert Patient.</li>
+                    <li><span class="danger">2. Trộm Đồ Genji:</span> Mob Hunt Gilgamesh. Bắt buộc phải dùng lệnh Steal ở các mốc HP < 40% và < 20% trong 2 trận đánh.</li>
+                    <li><span class="danger">3. Các Địa Điểm Biến Mất:</span> Royal Palace, Leviathan, Bur-Omisace, Draklor Lab, Bahamut (Point of No Return). Quái độc quyền có thể đánh bù trong Trial Mode.</li>
+                    <li><span class="danger">4. Small Package:</span> Bhujerba (Sau sự kiện Lhusu Mines) - Nhớ trả hàng ở Aerodrome trước khi rời đi.</li>
+                </ul>
 
-            <h3>⚠️ Danh Sách Các Mục Dễ Bỏ Lỡ Vĩnh Viễn (Missables List)</h3>
-            <ul>
-                <li><span class="danger">1. Great Serpentskin:</span> Loot từ Nidhogg (Lhusu Mines). <span class="highlight">TUYỆT ĐỐI KHÔNG BÁN!</span> Dùng cho Quest Desert Patient.</li>
-                <li><span class="danger">2. Trộm Đồ Genji:</span> Mob Hunt Gilgamesh. Bắt buộc phải dùng lệnh Steal ở các mốc HP < 40% và < 20% trong 2 trận đánh.</li>
-                <li><span class="danger">3. Các Địa Điểm Biến Mất:</span> Royal Palace, Leviathan, Bur-Omisace, Draklor Lab, Bahamut (Point of No Return). Quái độc quyền có thể đánh bù trong Trial Mode.</li>
-                <li><span class="danger">4. Small Package:</span> Bhujerba (Sau sự kiện Lhusu Mines) - Nhớ trả hàng ở Aerodrome trước khi rời đi.</li>
-            </ul>
+                <h3>🛡️ Hệ Thống 12 Nghề & Đội Hình Gợi Ý</h3>
+                <ul>
+                    <li><b>Knight + Bushi:</b> Sức mạnh cận chiến khủng, combo Katana cực nhanh.</li>
+                    <li><b>Shikari + Foebreaker:</b> Tanker né tránh đỉnh cao, kỹ năng phá giáp Boss.</li>
+                    <li><b>Machinist + White Mage:</b> Hồi máu an toàn từ xa bằng súng, không tốn MP.</li>
+                    <li><b>Uhlan + Time Battlemage:</b> Sát thương tầm trung, hỗ trợ Haste/Berserk.</li>
+                    <li><b>Red Battlemage + Black Mage:</b> Phù thủy hủy diệt diện rộng với phép Lửa Ardor.</li>
+                    <li><b>Monk + Black Mage:</b> Lượng HP khổng lồ càn quét toàn màn hình.</li>
+                </ul>
 
-            <h3>🛡️ Hệ Thống 12 Nghề & Đội Hình Gợi Ý</h3>
-            <ul>
-                <li><b>Knight + Bushi:</b> Sức mạnh cận chiến khủng, combo Katana cực nhanh.</li>
-                <li><b>Shikari + Foebreaker:</b> Tanker né tránh đỉnh cao, kỹ năng phá giáp Boss.</li>
-                <li><b>Machinist + White Mage:</b> Hồi máu an toàn từ xa bằng súng, không tốn MP.</li>
-                <li><b>Uhlan + Time Battlemage:</b> Sát thương tầm trung, hỗ trợ Haste/Berserk.</li>
-                <li><b>Red Battlemage + Black Mage:</b> Phù thủy hủy diệt diện rộng với phép Lửa Ardor.</li>
-                <li><b>Monk + Black Mage:</b> Lượng HP khổng lồ càn quét toàn màn hình.</li>
-            </ul>
-
-            <h3>📜 Cơ Chế Trạng Thái & Gambit Chuẩn</h3>
-            <ul>
-                <li><span class="highlight">Giải độc/mù/câm/đá/trạng thái:</span> Dùng Antidote, Eye Drops, Echo Herbs, Gold Needle, Remedy, Esuna.</li>
-                <li><span class="item">Slot 1:</span> Ally: KO ➔ Phoenix Down / Raise</li>
-                <li><span class="item">Slot 2:</span> Ally: HP < 40% ➔ Cura / Curaja / X-Potion</li>
-                <li><span class="item">Slot 3:</span> Ally: Any ➔ Remedy</li>
-                <li><span class="item">Slot 4:</span> Ally: Self ➔ Haste / Hastega</li>
-                <li><span class="item">Slot 5:</span> Foe: Party leader's target ➔ Attack</li>
-            </ul>
+                <h3>📜 Cơ Chế Trạng Thái & Gambit Chuẩn</h3>
+                <ul>
+                    <li><span class="highlight">Giải độc/mù/câm/đá/trạng thái:</span> Dùng Antidote, Eye Drops, Echo Herbs, Gold Needle, Remedy, Esuna.</li>
+                    <li><span class="item">Slot 1:</span> Ally: KO ➔ Phoenix Down / Raise</li>
+                    <li><span class="item">Slot 2:</span> Ally: HP < 40% ➔ Cura / Curaja / X-Potion</li>
+                    <li><span class="item">Slot 3:</span> Ally: Any ➔ Remedy</li>
+                    <li><span class="item">Slot 4:</span> Ally: Self ➔ Haste / Hastega</li>
+                    <li><span class="item">Slot 5:</span> Foe: Party leader's target ➔ Attack</li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const timelineData = [{"id": "s1", "cat": "Story", "step": "01", "name": "Cốt truyện 01: Rabanastre & Estersand", "loc": "Rabanastre / Estersand", "details": "Bắt đầu game, gặp Tomaj ở The Sandsea nhận Mob Hunt đầu tiên.", "subtasks": ["Gặp Tomaj ở quán bar The Sandsea", "Nhận Armlet & mở khóa bảng License Board", "Đi ra cổng Đông Dalmasca Estersand"], "requires": [], "provides": ["s1"]}, {"id": "h1", "cat": "Mob Hunt", "step": "01.1", "name": "Hunt 01: Rogue Tomato (Rank I)", "loc": "Dalmasca Estersand", "details": "Nhiệm vụ bắt buộc đầu game. Đánh xuống nửa máu nó sẽ nhảy xuống vực. Dứt điểm lấy bông hoa Galbana Lily.", "subtasks": ["Đánh Rogue Tomato xuống < 50% HP (nó nhảy xuống vực)", "Đuổi theo hạ gục hoàn toàn Rogue Tomato", "Hái hoa Galbana Lily trên đỉnh đồi", "Quay về trả quest cho Tomaj"], "requires": [], "provides": ["h1"]}, {"id": "s2", "cat": "Story", "step": "02", "name": "Cốt truyện 02: Giza Plains (Dry)", "loc": "Giza Plains", "details": "Penelo gia nhập. Nạp năng lượng cho đá Sunstone.", "subtasks": ["Gặp Penelo tại Rabanastre", "Đến làng Nomad Village ở Giza Plains", "Nạp đầy năng lượng cho đá Sunstone"], "requires": ["s1"], "provides": ["s2"]}, {"id": "sq16", "cat": "Side Quest", "step": "02.1", "name": "SQ 16: Sunstone Recharging", "loc": "Giza Plains (Dry)", "details": "Nạp năng lượng đá Shadowstone tại các Dark Crystal để làm nhiệm vụ cốt truyện.", "subtasks": ["Nhận Shadowstone từ MASH", "Tương tác với các mỏm đá Dark Crystal rực sáng", "Đạt 100% năng lượng đổi lấy Sunstone"], "requires": ["s2"], "provides": ["sq16"]}, {"id": "h2", "cat": "Mob Hunt", "step": "02.2", "name": "Hunt 02: Thextera (Rank I)", "loc": "Dalmasca Westsand", "details": "Nhận từ Gatsly ở Sandsea. Hạ đám sói nhỏ trước khi dồn sát thương.", "subtasks": ["Nhận Hunt từ Gatsly tại The Sandsea", "Đến Galtea Downs (West Sand)", "Tiêu diệt đám sói nhỏ xung quanh", "Hạ gục Thextera & trả quest"], "requires": ["s2"], "provides": ["h2"]}, {"id": "h3", "cat": "Mob Hunt", "step": "02.3", "name": "Hunt 03: Flowering Cactoid (Rank I)", "loc": "Dalmasca Estersand", "details": "Nhận từ Dantro ở Outpost. Hạ gục lấy Cactus Flower để làm Quest Desert Patient.", "subtasks": ["Gặp Dantro tại Estersand Outpost", "Đến Yardang Labyrinth tiêu diệt Flowering Cactoid", "Thu thập Cactus Flower (⚠️ KHÔNG BÁN SHOP!)", "Quay lại báo cáo Dantro"], "requires": ["s2"], "provides": ["cactus_flower"]}, {"id": "sq12", "cat": "Side Quest", "step": "02.4", "name": "SQ 12: Viera Matchmaking", "loc": "Rabanastre Plaza & Lowtown", "details": "Se duyên cho cô gái Viera ở Southern Plaza và anh chàng ở Lowtown.", "subtasks": ["Nói chuyện Lovestruck Man ở Southern Plaza", "Đến cổng Southgate nói chuyện với Viera Wandering", "Đến shop Yamoora's Gambits nói chuyện Viera", "Đến lan can tầng 2 quán The Sandsea nói chuyện Viera", "Quay lại đài phun nước gặp cả 2 nhận Loxley Bow"], "requires": ["s2"], "provides": ["sq12"]}, {"id": "sq7", "cat": "Side Quest", "step": "02.5", "name": "SQ 07: Ktjn the Viera (Phần 1)", "loc": "Rabanastre (Muthru Bazaar)", "details": "Lần trả lời tư vấn tâm lý 1 cho cô gái Viera Ktjn.", "subtasks": ["Tìm Ktjn đứng ở Muthru Bazaar", "Chọn đáp án khuyến khích tự tin (Trả lời lần 1)"], "requires": ["s2"], "provides": ["sq7_1"]}, {"id": "s3", "cat": "Story", "step": "03", "name": "Cốt truyện 03: Garamsythe Waterway & Palace", "loc": "Garamsythe Waterway", "details": "Đột nhập Hoàng cung Rabanastre.", "subtasks": ["Gặp Old Dalan ở Lowtown lấy Crescent Stone", "Mở cửa cống ngầm Garamsythe Waterway", "Đột nhập kho báu Hoàng cung"], "requires": ["s2"], "provides": ["s3"]}, {"id": "h4", "cat": "Mob Hunt", "step": "03.1", "name": "Hunt 04: Wraith (Rank I)", "loc": "Garamsythe Waterway", "details": "Nhận từ Milha ở Lowtown. Yếu ma thuật Lửa (Fire).", "subtasks": ["Nhận Hunt từ Milha ở Lowtown", "Đến Overflow Cloaca trong kênh ngầm", "Dùng phép Fire tiêu diệt Wraith", "Quay về nhận thưởng từ Milha"], "requires": ["s3"], "provides": ["h4"]}, {"id": "s4", "cat": "Story", "step": "04", "name": "Cốt truyện 04: Royal Escape & Waterway", "loc": "Waterway", "details": "Balthier & Fran gia nhập chính thức. Tháo chạy khỏi ngục.", "subtasks": ["Balthier & Fran gia nhập đội ngũ", "Gặp Vossler trong kênh ngầm", "Đánh hạ Boss Fire Elemental / Bushfire"], "requires": ["s3"], "provides": ["s4"]}, {"id": "s5", "cat": "Story", "step": "05", "name": "Cốt truyện 05: Nalbina Dungeon & Barheim Passage", "loc": "Nalbina / Barheim Passage", "details": "Vượt Barheim Passage thoát ra ngoài sa mạc.", "subtasks": ["Đánh tay đôi ở ngục Nalbina", "Lấy lại trang bị trong kho ngục", "Hạ Boss Mimic Queen ở cuối Barheim Passage"], "requires": ["s4"], "provides": ["s5"]}, {"id": "s6", "cat": "Story", "step": "06", "name": "Cốt truyện 06: Bhujerba & Lhusu Mines", "loc": "Bhujerba / Lhusu Mines", "details": "Đến thành phố bay Bhujerba và mỏ Lhusu Mines.", "subtasks": ["Đáp phi thuyền đến Bhujerba", "Lamont (Larsa) gia nhập party tạm thời", "Đi sâu vào mỏ Lhusu Mines giải cứu Penelo"], "requires": ["s5"], "provides": ["s6"]}, {"id": "sq17", "cat": "Side Quest", "step": "06.0", "name": "SQ 17: Bhujerba Small Package (⚠️ NHẬN NGAY)", "loc": "Bhujerba Aerodrome", "details": "⚠️ ĐẶC BIỆT: Nhận ngay khi vừa đến Bhujerba Aerodrome lần đầu. KHÔNG ĐƯỢC ĐI LEVIATHAN TRƯỚC KHI TRẢ HÀNG!", "subtasks": ["Gặp NPC tại Bhujerba Aerodrome nhận gói hàng", "Mang về giao cho NPC ở Rabanastre Aerodrome (Chạy về giao ngay)"], "missable": true, "requires": ["s6"], "provides": ["sq17"]}, {"id": "h5", "cat": "Mob Hunt", "step": "06.1", "name": "Hunt 05: Nidhogg (Rank I)", "loc": "Lhusu Mines", "details": "⚠️ ĐẶC BIỆT: Hạ Nidhogg rơi ra Great Serpentskin. TUYỆT ĐỐI KHÔNG BÁN VÀO SHOP! Cất kho làm Quest Desert Patient.", "subtasks": ["Nhận Hunt từ Aekom tại bến phi thuyền Bhujerba", "Đến Transit Way 1 tiêu diệt Nidhogg", "Thu thập Great Serpentskin (⚠️ CẤT KHO, KHÔNG BÁN!)", "Báo cáo trả quest cho Aekom"], "missable": true, "requires": ["s6"], "provides": ["great_serpentskin"]}, {"id": "h7", "cat": "Mob Hunt", "step": "06.3", "name": "Hunt 07: Rocktoise (Rank I)", "loc": "Lhusu Mines", "details": "Nhận từ Pilika ở Bhujerba. Dùng phép Blind và Wind/Aero.", "subtasks": ["Nhận Hunt từ Pilika ở Khuba Skyway", "Đến Site 2 Lhusu Mines hạ Rocktoise", "Trở về trả quest cho Pilika"], "requires": ["s6"], "provides": ["h7"]}, {"id": "sq11", "cat": "Side Quest", "step": "06.4", "name": "SQ 11: Pilika's Diary", "loc": "Bhujerba", "details": "Sau khi hạ Rocktoise, lấy nhật ký cho Pilika.", "subtasks": ["Nhận lời nhờ của Pilika đi lấy nhật ký ở Shop Trang Bị", "Tương tác với cuốn nhật ký trên kệ", "Chọn Đọc lén hoặc Không đọc", "Trả lại nhật ký cho Pilika nhận Jade Collar"], "requires": ["h7"], "provides": ["sq11"]}, {"id": "sq8", "cat": "Side Quest", "step": "06.5", "name": "SQ 08: Bhujerban Madhu", "loc": "Bhujerba", "details": "Nhặt và bán 14 chai rượu cao cấp Bhujerban Madhu với giá 1000 Gil/chai.", "subtasks": ["Nhặt đủ 14 chai rượu Bhujerban Madhu", "Bán lại cho 14 cư dân thèm rượu ở Bhujerba (1000 Gil/chai)"], "requires": ["s6"], "provides": ["sq8"]}, {"id": "s7", "cat": "Story", "step": "07", "name": "Cốt truyện 07: Dreadnought Leviathan", "loc": "Leviathan", "details": "Đột nhập chiến hạm Leviathan cứu Công chúa Ashe.", "subtasks": ["Bị bắt lên chiến hạm Leviathan", "Vossler hỗ trợ phá phong ấn ngục", "Giải cứu Công chúa Ashe", "Hạ Boss Judge Ghis"], "requires": ["s6"], "provides": ["s7"]}, {"id": "s8", "cat": "Story", "step": "08", "name": "Cốt truyện 08: Ogir-Yensa & Nam-Yensa Sandsea", "loc": "Nam-Yensa Sandsea", "details": "Băng qua hai biển cát khổng lồ tiến về phía Tây.", "subtasks": ["Vượt qua biển cát Ogir-Yensa Sandsea", "Gặp Urutan-Yensa lấy đồ ăn nhẹ Chocobo", "Băng qua Nam-Yensa Sandsea đến lăng mộ"], "requires": ["s7"], "provides": ["s8"]}, {"id": "h10", "cat": "Mob Hunt", "step": "08.1", "name": "Hunt 10: Wyvern Lord (Rank II)", "loc": "Nam-Yensa Sandsea", "details": "Quái bay trên không. Phải dùng Cung/Súng/Phép để đánh.", "subtasks": ["Nhận Hunt từ Imperial Shadow ở Amanro", "Đến Simoon Bluff hạ Wyvern Lord", "Trở về trả quest"], "requires": ["s8"], "provides": ["h10"]}, {"id": "s9", "cat": "Story", "step": "09", "name": "Cốt truyện 09: Tomb of Raithwall", "loc": "Tomb of Raithwall", "details": "Thu phục Esper Belias. MỞ KHÓA SECOND JOB CHO TOÀN BỘ NHÂN VẬT!", "subtasks": ["Hạ Demon Wall (Bức tường ma)", "Giải câu đố bệ đá trong lăng mộ", "Đánh gục Esper Belias", "Lấy Dawn Shard & mở ô Second Job!"], "requires": ["s8"], "provides": ["s9"]}, {"id": "e1", "cat": "Esper", "step": "09.1", "name": "Esper 01: Belias (The Wielder)", "loc": "Tomb of Raithwall", "details": "Esper Cốt truyện (Hệ Lửa). Mở khóa ô Second Job.", "subtasks": ["Đánh gục Belias tại Tomb of Raithwall", "Gán Esper Belias cho 1 nhân vật để mở Second Job"], "requires": ["s9"], "provides": ["e1"]}, {"id": "sq1", "cat": "Side Quest", "step": "09.2", "name": "SQ 01: Desert Patient (Cứu Người Bệnh Estersand)", "loc": "Estersand", "details": "Giao Cactus Flower, Semclam Shells, Neebra Medic, Valeblossom Dew & Great Serpentskin để lấy Barheim Key và Golden Amulet.", "subtasks": ["1️⃣ Giao Cactus Flower cho Dantro's Wife", "2️⃣ Nhặt 2-5 Semclam Shells bãi sông Nebra giao", "3️⃣ Lấy 2 lọ Neebra Medic từ Dantro mang về", "4️⃣ Đi thuyền sang bờ Bắc hái 1-3 Valeblossom Dew", "5️⃣ ⚠️ GIAO GREAT SERPENTSKIN (Loot Nidhogg)", "6️⃣ Trở lại nói chuyện nhận BARHEIM KEY & Golden Amulet"], "missable": true, "requires": ["cactus_flower", "great_serpentskin", "s9"], "provides": ["barheim_key", "sq1"]}, {"id": "e7", "cat": "Esper", "step": "09.4", "name": "Esper 07: Zalera (The Deathbringer)", "loc": "Barheim Passage", "details": "Dùng Barheim Key từ Quest Desert Patient vào khu vực sâu trong ngục hạ Zalera.", "subtasks": ["Dùng Barheim Key mở cổng ngục Barheim ở Murmuring Calms", "Đi sâu vào khu vực Terminus No. 7", "Đánh hạ Esper Zalera trong vòng 5 phút"], "requires": ["barheim_key"], "provides": ["e7"]}, {"id": "sq2", "cat": "Side Quest", "step": "09.5", "name": "SQ 02: Lost Cactoid (Thuyền Bờ Bắc)", "loc": "Estersand South Bank", "details": "Nói chuyện với Tchigri sang bờ Bắc tìm xương rồng nhỏ rủ về làng để mở tuyến thuyền.", "subtasks": ["Nói chuyện Tchigri & Ruksel ở bến thuyền South Bank", "Đi thuyền sang bờ Bắc gặp gia đình xương rồng", "Đưa con xương rồng nhỏ trở về gặp mẹ ở bờ Nam", "Mở khóa tuyến thuyền tự do đi lại"], "requires": ["s9"], "provides": ["sq2"]}, {"id": "sq6", "cat": "Side Quest", "step": "09.6", "name": "SQ 06: Earth Tyrant (Bão Cát Westsand)", "loc": "Rabanastre Westgate / Westsand", "details": "Gặp Rimzat chế quạt Wind Vane ➔ hạ Earth Tyrant dẹp bão cát.", "subtasks": ["Nói chuyện Rimzat tại Rabanastre Westgate", "Sang Lowtown gặp Cotter lấy thông tin", "Đến Estersand gặp Dantro's Wife lấy Wind Globe", "Giao đồ cho Rimzat nhận Wind Vane", "Mang Wind Vane ra Wyrm's Nest hạ Boss Earth Tyrant"], "requires": ["s9"], "provides": ["sq6"]}, {"id": "h12", "cat": "Mob Hunt", "step": "09.7", "name": "Hunt 12: Ringwyrm (Rank III)", "loc": "Dalmasca Westsand", "details": "Xuất hiện khi Westsand có bão cát (hoặc sau khi hạ Earth Tyrant). Yếu Băng (Blizzard).", "subtasks": ["Nhận Hunt từ Balzac ở Lowtown Rabanastre", "Đến Windtrace Dunes (Dalmasca Westsand) khi có bão cát", "Dùng ma thuật Blizzard tiêu diệt Ringwyrm", "Trở về trả quest cho Balzac"], "requires": ["s9"], "provides": ["h12"]}, {"id": "h6", "cat": "Mob Hunt", "step": "10.1", "name": "Hunt 06: Cluckatrice (Rank I)", "loc": "Giza Plains (Dry/Rains)", "details": "Dọn sạch quái khu vực Gizmunt rồi quay lại để Gà khổng lồ xuất hiện.", "subtasks": ["Nhận Hunt từ Dania ở Nomad Village", "Đến Gizmunt Wall dọn sạch 100% quái vật", "Chuyển zone rồi quay lại tiêu diệt Cluckatrice & 3 gà con", "Nhận thưởng từ Dania"], "requires": ["s9"], "provides": ["cluckatrice_dead"]}, {"id": "sq5", "cat": "Side Quest", "step": "10.2", "name": "SQ 05: Cockatrice Escape (6 Gà Đi Lạc)", "loc": "Toàn thế giới", "details": "Đeo Feather of the Flock tìm 6 con gà Cockatrice đi lạc khắp các thành phố.", "subtasks": ["🐔 Saccio (Lowtown Rabanastre)", "🐔 Agyu (Mt Bur-Omisace)", "🐔 Chit (Eruyt Village)", "🐔 Renn (Port of Balfonheim)", "🐔 Shurry (Imperial Archades)", "🐔 Moomba (Old Archades)"], "requires": ["cluckatrice_dead"], "provides": ["sq5"]}, {"id": "h9", "cat": "Mob Hunt", "step": "10.3", "name": "Hunt 09: Crocadile (Rank II)", "loc": "Giza Plains (Rains)", "details": "Chỉ xuất hiện mùa mưa Giza. Yếu Lửa (Fire).", "subtasks": ["Nhận Hunt từ Sadeen ở Giza Plains", "Đợi Giza chuyển sang MÙA MƯA", "Đến Starfall Field tiêu diệt Crocadile", "Trả quest cho Sadeen"], "requires": ["s9"], "provides": ["h9"]}, {"id": "s10", "cat": "Story", "step": "10", "name": "Cốt truyện 10: Ozmone Plain & Jahara", "loc": "Ozmone Plain / Jahara", "details": "Tiến xuống phía Nam qua Ozmone Plain đến làng người Garif.", "subtasks": ["Băng qua Ozmone Plain", "Đến làng Jahara gặp High Chief", "Larsa gia nhập lại đội ngũ"], "requires": ["s9"], "provides": ["s10"]}, {"id": "h8", "cat": "Mob Hunt", "step": "10.4", "name": "Hunt 08: Enkelados (Rank II)", "loc": "Ozmone Plain", "details": "Nhận từ Low-Chief Zayalu ở Jahara. Dọn quái tộc Wu rồi quay lại.", "subtasks": ["Nhận Hunt từ Low-Chief Zayalu", "Đến The Shred dọn sạch quái tộc Wu", "Chuyển zone quay lại hạ Enkelados", "Trả quest nhận Erase Scroll"], "requires": ["s10"], "provides": ["h8"]}, {"id": "e6", "cat": "Esper", "step": "10.5", "name": "Esper 06: Adrammelech (The Wroth)", "loc": "Zertinan Caverns", "details": "Esper Sét ẩn nằm trong hang Zertinan Caverns (lối vào từ Ozmone Plain).", "subtasks": ["Đến Athroza Quicksands trong Zertinan Caverns", "Tiêu diệt đám quái Skulwyrm quấy rối", "Hạ gục Esper Sét Adrammelech"], "requires": ["s10"], "provides": ["e6"]}, {"id": "s11", "cat": "Story", "step": "11", "name": "Cốt truyện 11: Golmore Jungle & Eruyt Village", "loc": "Golmore Jungle / Eruyt", "details": "Tiến vào rừng rậm Golmore và làng tộc Viera.", "subtasks": ["Tiến vào rừng rậm Golmore Jungle", "Mở đường phong ấn vào làng Eruyt Village", "Đi tìm Mjrn ở Henne Mines", "Hạ Boss Elder Dragon giải phong ấn rừng"], "requires": ["s10"], "provides": ["s11"]}, {"id": "s12", "cat": "Story", "step": "12", "name": "Cốt truyện 12: Paramina Rift & Mt. Bur-Omisace", "loc": "Paramina Rift", "details": "Băng qua vùng núi tuyếtParamina Rift đến Thánh địa Mt. Bur-Omisace.", "subtasks": ["Vượt qua vùng núi tuyết Paramina Rift", "Đến Thánh địa Mt. Bur-Omisace gặp Gran Kiltias Anastasis"], "requires": ["s11"], "provides": ["s12"]}, {"id": "s13", "cat": "Story", "step": "13", "name": "Cốt truyện 13: Stillshrine of Miriam", "loc": "Stillshrine of Miriam", "details": "Đền ngầm Miriam. Thu phục Esper Mateus và đánh hạ Judge Bergan.", "subtasks": ["Trang bị Dawn Shard để mở cổng đền Miriam", "Xoay 3 bức tượng khổng lồ hướng về trung tâm", "Thu phục Esper Mateus", "Trở về Mt. Bur-Omisace đánh hạ Judge Bergan"], "requires": ["s12"], "provides": ["s13"]}, {"id": "e2", "cat": "Esper", "step": "13.1", "name": "Esper 02: Mateus (The Corrupt)", "loc": "Stillshrine of Miriam", "details": "Esper Cốt truyện (Hệ Băng). Hạ đám Ice Azers trước.", "subtasks": ["Đánh hạ đám đệ Ice Azers xung quanh", "Hạ gục Esper Mateus ở tầng sâu đền Miriam"], "requires": ["s13"], "provides": ["e2"]}, {"id": "e10", "cat": "Esper", "step": "13.2", "name": "Esper 10: Zeromus (The Condemner)", "loc": "Stillshrine of Miriam", "details": "Lấy Stone of Condemner từ Kiltian Elder ở Mt Bur-Omisace (sau khi đánh Bergan) ➔ quay lại đền Miriam hạ Zeromus.", "subtasks": ["Nói chuyện Kiltian Elder ở Mt Bur-Omisace lấy Stone of the Condemner", "Đến Ward of the Sword-King trong đền Miriam dùng đá mở cổng", "Hạ gục Esper Zeromus (Trận đấu KHÔNG ĐƯỢC DÙNG MÀU PHÉP - Magic Sealed!)"], "requires": ["s13"], "provides": ["e10"]}, {"id": "s14", "cat": "Story", "step": "14", "name": "Cốt truyện 14: Mosphoran Highwaste & Salikawood", "loc": "Mosphoran / Salikawood", "details": "Đi về phía Bắc Nalbina mở đường sang Salikawood.", "subtasks": ["Băng qua Mosphoran Highwaste", "Hạ Boss King Bomb ở Salikawood", "Sửa cây cầu Salikawood nối sang Phon Coast"], "requires": ["s13"], "provides": ["s14"]}, {"id": "sq10", "cat": "Side Quest", "step": "14.1", "name": "SQ 10: July the Secret Agent", "loc": "Nalbina Town", "details": "Thuê Chocobo dọa 2 tên lính gác cổng Nalbina để giúp điệp viên July thoát ra.", "subtasks": ["Thuê Chocobo tại Nalbina Town", "Cưỡi Chocobo lại gần 2 tên lính gác cổng phía Bắc", "Dọa lính gác bỏ chạy giúp July thoát ra", "Gặp lại July tại shop phép thuật Archades nhận thưởng"], "missable": true, "requires": ["s14"], "provides": ["sq10"]}, {"id": "sq13", "cat": "Side Quest", "step": "14.2", "name": "SQ 13: Jovy the Hero", "loc": "Nalbina Town", "details": "Nói chuyện với chú bé Jovy sau khi hoàn thành các Hunt ở Nalbina.", "subtasks": ["Hoàn thành các Hunt xuất phát từ Nalbina", "Nói chuyện chú bé Jovy chạy quanh thị trấn sau mỗi Hunt", "Nhận thưởng Elixir từ Jovy"], "requires": ["s14"], "provides": ["sq13"]}, {"id": "e9", "cat": "Esper", "step": "14.3", "name": "Esper 09: Exodus (The Judge-Sal)", "loc": "Mosphoran Highwaste", "details": "Mở các đài nước phong ấn ở Babbling Vale để tạo đường lên đỉnh núi hạ Exodus.", "subtasks": ["Kích hoạt các đài nước Shrine of South/West/East Wind", "Cưỡi Chocobo qua đường cây ẩn lên đỉnh Babbling Vale", "Hạ gục Esper Exodus"], "requires": ["s14"], "provides": ["e9"]}, {"id": "h14", "cat": "Mob Hunt", "step": "14.4", "name": "Hunt 14: Encephalartos (Rank III)", "loc": "Salikawood", "details": "Nhận từ Gulamu ở Nalbina. Dọn quái rồi quay lại.", "subtasks": ["Nhận Hunt từ Gulamu ở Nalbina", "Đến The Piebald Path dọn quái", "Tiêu diệt Encephalartos & trả quest"], "requires": ["s14"], "provides": ["h14"]}, {"id": "h15", "cat": "Mob Hunt", "step": "14.5", "name": "Hunt 15: Carrot (Wyrmhero) (Rank VII)", "loc": "Salikawood", "details": "KHÔNG ĐƯỢC ĐÁNH BẤT KỲ CON QUÁI NÀO khi di chuyển từ zone kế bên vào phòng nó.", "subtasks": ["Nhận Hunt từ Zama ở Nalbina", "Di chuyển vào Sun-dappled Path mà KHÔNG ĐÁNH BẤT KỲ QUÁI NÀO", "Hạ gục quái cây Carrot", "Báo cáo Zama nhận thưởng"], "requires": ["s14"], "provides": ["h15"]}, {"id": "s15", "cat": "Story", "step": "15", "name": "Cốt truyện 15: Phon Coast & Tchita Uplands", "loc": "Phon Coast", "details": "Đến bãi biển Phon Coast và trại thợ săn.", "subtasks": ["Đến bãi biển Phon Coast", "Trọ tại Hunter's Camp", "Đi tiếp sang đồng cỏ Tchita Uplands"], "requires": ["s14"], "provides": ["s15"]}, {"id": "sq3", "cat": "Side Quest", "step": "15.1", "name": "SQ 03: Hunt Club (Hội Thợ Săn Phon Coast)", "loc": "Phon Coast", "details": "Nói chuyện với Huntmaster gia nhập hội săn 30 quái hiếm. Chia điểm 16 Stok / 5 Atak / 5 Blok.", "subtasks": ["Gia nhập Hunt Club tại Phon Coast", "Săn 30 con quái hiếm (Trophy Rare Monsters)", "⚠️ CHIA ĐIỂM: 16 cho Stok, 5 cho Atak, 5 cho Blok", "Đổi bộ 3 tối thượng: Zodiac Spear, Zodiac Shield & Genji Gloves!"], "requires": ["s15"], "provides": ["sq3"]}, {"id": "sq14", "cat": "Side Quest", "step": "15.2", "name": "SQ 14: Nebra River Fishing Minigame", "loc": "Estersand South Bank", "details": "Mở minigame câu cá sau khi đến Phon Coast lấy cần câu Matamune.", "subtasks": ["Lấy cần câu Matamune từ Ruksel", "Hoàn thành 5 bãi câu từ dễ đến khó", "Đạt danh hiệu Master Angler lấy Lu-Shang's Badge (nguyên liệu Wyrmhero Blade)"], "requires": ["sq3"], "provides": ["sq14"]}, {"id": "h11", "cat": "Mob Hunt", "step": "15.3", "name": "Hunt 11: White Mousse (Rank V)", "loc": "Garamsythe Waterway", "details": "Nhận chìa khóa Sluice Gate Key để điều chỉnh cống ngầm.", "subtasks": ["Nhận Hunt từ Sorbet ở Rabanastre Westgate", "Đến West Sluiceway hạ White Mousse (yếu Fire)", "Nhận thưởng SLUICE GATE KEY"], "requires": ["s15"], "provides": ["sluice_key"]}, {"id": "e8", "cat": "Esper", "step": "15.4", "name": "Esper 08: Cúchulainn (The Impure)", "loc": "Garamsythe Waterway", "details": "Dùng Sluice Gate Key mở van nước cống ngầm hạ Cúchulainn.", "subtasks": ["Dùng Sluice Gate Key đóng/mở van nước No. 3, 4, 10, 11 theo đúng thứ tự", "Tiến vào No. 1st Cloaca (máu tụt liên tục!)", "Hạ gục Esper Cúchulainn"], "requires": ["sluice_key"], "provides": ["e8"]}, {"id": "h13", "cat": "Mob Hunt", "step": "16.1", "name": "Hunt 13: Marilith (Rank V)", "loc": "Sochen Cave Palace", "details": "Đứng đợi khoảng 5 phút trong phòng Hall of Aspiration.", "subtasks": ["Nhận Hunt tại quán bar Balfonheim", "Vào Hall of Aspiration trong Sochen Cave", "Đứng yên đợi 5 phút cho Marilith bò ra", "Hạ gục rắn khổng lồ Marilith"], "requires": ["s15"], "provides": ["h13"]}, {"id": "s16", "cat": "Story", "step": "16", "name": "Cốt truyện 16: Sochen Cave & Archades", "loc": "Imperial City of Archades", "details": "Tiến vào Đế đô Archades.", "subtasks": ["Vượt qua mê cung Sochen Cave Palace", "Đến Old Archades gặp Jules", "Đi xe taxi lên khu trung tâm Imperial City of Archades"], "requires": ["s15"], "provides": ["s16"]}, {"id": "sq18", "cat": "Side Quest", "step": "16.2", "name": "SQ 18: Archades Sandalwood Chop", "loc": "Archades", "details": "Ghép đôi 28 cặp cư dân tích đủ 28 lá thư Chops lấy vé VIP Sandalwood Chop.", "subtasks": ["Nói chuyện ghép đôi 28 cặp cư dân Archades", "Tích đủ 28 Chops", "Đổi lấy Sandalwood Chop (Vé VIP Taxi)"], "requires": ["s16"], "provides": ["sq18"]}, {"id": "sq4", "cat": "Side Quest", "step": "16.3", "name": "SQ 04: Three Medallions (Giải Phong Ấn Nabudis)", "loc": "Rabanastre/Archades/Salikawood", "details": "Gom 3 mảnh huy hiệu tại Rabanastre/Archades/Salikawood.", "subtasks": ["🧩 Medallion 1 (Rabanastre): Ghép 3 mảnh vỡ từ Dalan, Kytes & Filo", "🧩 Medallion 2 (Archades): Gặp Otto ở Old Archades lấy lại huy hiệu", "🧩 Medallion 3 (Salikawood): Hạ King Bomb gặp Ma'kleou ghép chìa khóa", "🔑 Nhận 3 huy hiệu Medallion of Bravery, Love & Luster"], "requires": ["s16"], "provides": ["three_medallions", "sq4"]}, {"id": "sq22", "cat": "Side Quest", "step": "16.4", "name": "SQ 22: Nabudis Secret Baknamy Merchant", "loc": "Necrohol of Nabudis", "details": "Kiểm tra bức tường ẩn trong phòng Hall of Effulgent Light gọi thương nhân Baknamy.", "subtasks": ["Vào Necrohol of Nabudis", "Kiểm tra góc tường ẩn ở Hall of Effulgent Light", "Gọi thương nhân Baknamy bán phép Esunaga & Ether"], "requires": ["s16"], "provides": ["sq22"]}, {"id": "e11", "cat": "Esper", "step": "16.5", "name": "Esper 11: Chaos (Walker of Wheel)", "loc": "Necrohol of Nabudis", "details": "Dùng 3 huy hiệu từ Quest Three Medallions mở phòng phong ấn hạ Chaos.", "subtasks": ["Dùng Medallions mở 3 cánh cửa phong ấn", "Hạ 2 Boss phụ Humbaba Zealot & Fury", "Tiến vào Cloister of Highborn hạ Esper Wind Chaos (Cấm đánh vật lý - Attack Sealed!)"], "requires": ["three_medallions"], "provides": ["e11"]}, {"id": "s17", "cat": "Story", "step": "17", "name": "Cốt truyện 17: Draklor Laboratory", "loc": "Draklor Laboratory", "details": "Đột nhập phòng thí nghiệm Draklor ở Archades.", "subtasks": ["Đột nhập tháp Draklor Laboratory", "Sử dụng thẻ Keycard chuyển tầng", "Đánh hạ Boss Doctor Cid & Redidas hỗ trợ"], "requires": ["s16"], "provides": ["s17"]}, {"id": "s18", "cat": "Story", "step": "18", "name": "Cốt truyện 18: Port of Balfonheim & Feywood", "loc": "Balfonheim / Feywood", "details": "Đến cảng Balfonheim và tiến vào rừng sương mù Feywood.", "subtasks": ["Đến cảng Balfonheim", "Mở đường phong ấn tiến vào rừng rậm Feywood", "Hạ Boss Rafflesia"], "requires": ["s17"], "provides": ["s18"]}, {"id": "sq19", "cat": "Side Quest", "step": "18.1", "name": "SQ 19: Balfonheim Footrace", "loc": "Port of Balfonheim", "details": "Minigame chạy đua bấm phím với Rikken tại cảng Balfonheim.", "subtasks": ["Nói chuyện Rikken ở bến cảng Balfonheim", "Bấm nút tăng tốc thắng 10 cấp độ đua", "Nhận Pirate Hat & trang bị hiếm"], "requires": ["s18"], "provides": ["sq19"]}, {"id": "h17", "cat": "Mob Hunt", "step": "18.2", "name": "Hunt 17: Behemoth King (Rank VII)", "loc": "Feywood", "details": "Dọn sạch toàn bộ quái ở 2 khu vực Edge of Reason & Ice Field Cleared.", "subtasks": ["Nhận Hunt từ Montblanc", "Dọn SẠCH 100% QUÁI ở Edge of Reason & Ice Field Cleared", "Chuyển zone hạ Behemoth King", "Nhận 250 Triệu Gil thưởng tại Rabanastre Lowtown!"], "requires": ["s18"], "provides": ["h17"]}, {"id": "s19", "cat": "Story", "step": "19", "name": "Cốt truyện 19: Giruvegan & Great Crystal", "loc": "Giruvegan", "details": "Tiến vào thành phố cổ đại Giruvegan & mê cung Great Crystal.", "subtasks": ["Giải mã Illusionary Gates ở Giruvegan", "Hạ Boss Daedalus & Tyrant", "Đột nhập mê cung thủy tinh The Great Crystal"], "requires": ["s18"], "provides": ["s19"]}, {"id": "e3", "cat": "Esper", "step": "19.1", "name": "Esper 03: Shemhazai (The Whisperer)", "loc": "Giruvegan", "details": "Esper Cốt truyện (Hệ Linh Hồn). Đổi kháng thuộc tính liên tục.", "subtasks": ["Đánh gục Shemhazai tại Giruvegan", "Lấy Treaty-Blade từ Ocuria"], "requires": ["s19"], "provides": ["e3"]}, {"id": "e12", "cat": "Esper", "step": "19.2", "name": "Esper 12: Ultima (The High Seraph)", "loc": "The Great Crystal", "details": "Giải mã hệ thống cổng ma thuật Capricorn, Aquarius, Pisces trong Great Crystal tiến vào tâm hạ Ultima.", "subtasks": ["Kích hoạt chuỗi cổng Capricorn, Aquarius, Pisces Gate", "Đến Crystal Peak", "Hạ gục Esper Quang Ultima (Thay đổi Field Effect liên tục)"], "requires": ["s19"], "provides": ["e12"]}, {"id": "sq21", "cat": "Side Quest", "step": "19.3", "name": "SQ 21: Great Crystal Treasures", "loc": "The Great Crystal", "details": "Lấy Excalibur và Zodiac Escutcheon trong rương ẩn tại Great Crystal.", "subtasks": ["Mở cổng Pisces Gate", "Đến rương chứa Excalibur (100% xuất hiện)", "Đến rương chứa Zodiac Escutcheon"], "requires": ["s19"], "provides": ["sq21"]}, {"id": "s20", "cat": "Story", "step": "20", "name": "Cốt truyện 20: Ridorana Cataract & Pharos Lighthouse", "loc": "Pharos Lighthouse", "details": "Chinh phục tháp hải đăng Pharos.", "subtasks": ["Đến đảo Ridorana Cataract", "Leo 100 tầng tháp Pharos First, Second & Third Ascent", "Hạ Boss Judge Ghis, Hydro, Redidas hy sinh"], "requires": ["s19"], "provides": ["s20"]}, {"id": "e4", "cat": "Esper", "step": "20.1", "name": "Esper 04: Hashmal (Bringer of Order)", "loc": "Pharos (Second Ascent)", "details": "Esper Cốt truyện (Hệ Đất). Dùng Float né đòn Đất.", "subtasks": ["Đánh gục Hashmal ở tầng 90 Pharos Second Ascent"], "requires": ["s20"], "provides": ["e4"]}, {"id": "e5", "cat": "Esper", "step": "20.2", "name": "Esper 05: Famfrit (The Dark Cloud)", "loc": "Pharos (Third Ascent)", "details": "Esper Cốt truyện (Hệ Nước). Đấu cùng Doctor Cid ở đỉnh tháp Pharos.", "subtasks": ["Đánh hạ Famfrit & Doctor Cid trên đỉnh tháp Pharos"], "requires": ["s20"], "provides": ["e5"]}, {"id": "h16", "cat": "Mob Hunt", "step": "20.3", "name": "Hunt 16: Gilgamesh & Enkidu (Rank VII)", "loc": "Lhusu Mines (Site 7)", "details": "⚠️ TRỘM BỘ GENJI TRƯỚC KHỊ HẠ BOSS! Đấu 2 trận tại Lhusu Mines.", "subtasks": ["⚔️ Trận 1 (Tasche Span): Steal Genji Shield (HP < 40%) & Genji Gauntlets (HP < 20%)", "⚔️ Trận 2 (Site 7): Steal Genji Armor (HP < 40%) & Genji Helm (HP < 20%)", "Hạ gục Gilgamesh & Enkidu nhận Masamune!"], "missable": true, "requires": ["s20"], "provides": ["genji_gear"]}, {"id": "e13", "cat": "Esper", "step": "20.5", "name": "Esper 13: Zodiark (Keeper of Precepts)", "loc": "Henne Mines", "details": "Cần thu phục đủ 10 Esper khác ➔ nói chuyện Geomancer Yugelu ở Jahara mở lối vào Special Charter Shaft Henne Mines.", "subtasks": ["Thu phục đủ ít nhất 10 Esper bất kỳ", "Gặp Geomancer Yugelu ở Jahara để mở cổng Henne Mines", "Đi đến Special Charter Shaft", "Hạ Esper Tối Cường Zodiark (Chú ý đòn Dark Eclipse 100% K.O)"], "requires_espers": 10, "provides": ["e13"]}, {"id": "sq15", "cat": "Side Quest", "step": "20.6", "name": "SQ 15: Wyrm Philosopher & Hell Wyrm", "loc": "Sochen Cave Palace", "details": "Hạ Hunt Vyraal lấy Dragon Scale ➔ đố chữ Windmill #10 ➔ mở Door of Hours hạ Hell Wyrm (5 Triệu HP).", "subtasks": ["Hạ Hunt Vyraal lấy Dragon Scale", "Đưa Dragon Scale cho nhà triết học ở Windmill #10 Tchita Uplands nhận Ageworn Key", "Đến Sochen Cave Palace mở Door of Hours", "Khai chiến & hạ gục Super Boss Hell Wyrm (5 Triệu HP)"], "requires": ["s20"], "provides": ["sq15"]}, {"id": "sq20", "cat": "Side Quest", "step": "20.7", "name": "SQ 20: The Sun-Crest & Moon-Crest", "loc": "Royal Palace / Estersand", "details": "Nhặt Sun Crest (rương Royal Palace) và Moon Crest (Estersand).", "subtasks": ["Mở rương chứa Sun Crest ở kho Royal Palace", "Mở rương chứa Moon Crest ở bãi biển Estersand", "Kết hợp với Godslayer Badge & Lu-Shang's Badge chế Wyrmhero Blade!"], "requires": ["s20"], "provides": ["sq20"]}, {"id": "h18", "cat": "Mob Hunt", "step": "20.8", "name": "Hunt 18: Yiazmat (Rank VII)", "loc": "Ridorana Cataract", "details": "SUPER BOSS KHỦNG NHẤT GAME (50 Triệu HP). Mở khóa sau khi hạ sạch các Hunt khác.", "subtasks": ["Hoàn thành TOÀN BỘ 44 Mob Hunts khác", "Đến Colosseum ở Ridorana Cataract", "Đánh gục SUPER BOSS Yiazmat (50 Triệu HP - 50 thanh máu!)", "Nhận Godslayer Badge từ Montblanc"], "requires": ["s20"], "provides": ["h18"]}, {"id": "s21", "cat": "Story", "step": "21", "name": "Cốt truyện 21: Sky Fortress Bahamut (FINAL)", "loc": "Sky Fortress Bahamut", "details": "⚠️ POINT OF NO RETURN. Trận chiến cuối cùng!", "subtasks": ["Đáp phi thuyền lên Sky Fortress Bahamut", "Hạ Gabranth & Vaynard", "Đánh gục Trùm Cuối Vayne Novus / The Undying ➔ ĐẢO PHÁ GAME 100%!"], "requires": ["s20"], "provides": ["s21"]}];
-    
-    const GIST_ID = 'fa2bcffba4861b5f8edfde9db3fdf23f';
-    const GITHUB_TOKEN = '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';
-
-    let currentTab = 'all';
-    let userProvided = {};
-    let userDone = {};
-    let userSubtasks = {};
-
-    async function loadCloudData() {
-        try {
-            let response = await fetch(`[https://api.github.com/gists/$](https://api.github.com/gists/$){GIST_ID}`, {
-                headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            if (response.ok) {
-                let data = await response.json();
-                if (data.files && data.files['ffxii-save.json']) {
-                    let content = JSON.parse(data.files['ffxii-save.json'].content);
-                    userDone = content.done || {};
-                    userSubtasks = content.subtasks || {};
-                    userProvided = content.provided || {};
-                }
-            }
-        } catch (e) {
-            console.log("Không thể kết nối GitHub Cloud, tải dữ liệu từ bộ nhớ đệm local.", e);
-        }
+    <script>
+        const timelineData = [{"id": "s1", "cat": "Story", "step": "01", "name": "Cốt truyện 01: Rabanastre & Estersand", "loc": "Rabanastre / Estersand", "details": "Bắt đầu game, gặp Tomaj ở The Sandsea nhận Mob Hunt đầu tiên.", "subtasks": ["Gặp Tomaj ở quán bar The Sandsea", "Nhận Armlet & mở khóa bảng License Board", "Đi ra cổng Đông Dalmasca Estersand"], "requires": [], "provides": ["s1"]}, {"id": "h1", "cat": "Mob Hunt", "step": "01.1", "name": "Hunt 01: Rogue Tomato (Rank I)", "loc": "Dalmasca Estersand", "details": "Nhiệm vụ bắt buộc đầu game. Đánh xuống nửa máu nó sẽ nhảy xuống vực. Dứt điểm lấy bông hoa Galbana Lily.", "subtasks": ["Đánh Rogue Tomato xuống < 50% HP (nó nhảy xuống vực)", "Đuổi theo hạ gục hoàn toàn Rogue Tomato", "Hái hoa Galbana Lily trên đỉnh đồi", "Quay về trả quest cho Tomaj"], "requires": [], "provides": ["h1"]}, {"id": "s2", "cat": "Story", "step": "02", "name": "Cốt truyện 02: Giza Plains (Dry)", "loc": "Giza Plains", "details": "Penelo gia nhập. Nạp năng lượng cho đá Sunstone.", "subtasks": ["Gặp Penelo tại Rabanastre", "Đến làng Nomad Village ở Giza Plains", "Nạp đầy năng lượng cho đá Sunstone"], "requires": ["s1"], "provides": ["s2"]}, {"id": "sq16", "cat": "Side Quest", "step": "02.1", "name": "SQ 16: Sunstone Recharging", "loc": "Giza Plains (Dry)", "details": "Nạp năng lượng đá Shadowstone tại các Dark Crystal để làm nhiệm vụ cốt truyện.", "subtasks": ["Nhận Shadowstone từ MASH", "Tương tác với các mỏm đá Dark Crystal rực sáng", "Đạt 100% năng lượng đổi lấy Sunstone"], "requires": ["s2"], "provides": ["sq16"]}, {"id": "h2", "cat": "Mob Hunt", "step": "02.2", "name": "Hunt 02: Thextera (Rank I)", "loc": "Dalmasca Westsand", "details": "Nhận từ Gatsly ở Sandsea. Hạ đám sói nhỏ trước khi dồn sát thương.", "subtasks": ["Nhận Hunt từ Gatsly tại The Sandsea", "Đến Galtea Downs (West Sand)", "Tiêu diệt đám sói nhỏ xung quanh", "Hạ gục Thextera & trả quest"], "requires": ["s2"], "provides": ["h2"]}, {"id": "h3", "cat": "Mob Hunt", "step": "02.3", "name": "Hunt 03: Flowering Cactoid (Rank I)", "loc": "Dalmasca Estersand", "details": "Nhận từ Dantro ở Outpost. Hạ gục lấy Cactus Flower để làm Quest Desert Patient.", "subtasks": ["Gặp Dantro tại Estersand Outpost", "Đến Yardang Labyrinth tiêu diệt Flowering Cactoid", "Thu thập Cactus Flower (⚠️ KHÔNG BÁN SHOP!)", "Quay lại báo cáo Dantro"], "requires": ["s2"], "provides": ["cactus_flower"]}, {"id": "sq12", "cat": "Side Quest", "step": "02.4", "name": "SQ 12: Viera Matchmaking", "loc": "Rabanastre Plaza & Lowtown", "details": "Se duyên cho cô gái Viera ở Southern Plaza và anh chàng ở Lowtown.", "subtasks": ["Nói chuyện Lovestruck Man ở Southern Plaza", "Đến cổng Southgate nói chuyện với Viera Wandering", "Đến shop Yamoora's Gambits nói chuyện Viera", "Đến lan can tầng 2 quán The Sandsea nói chuyện Viera", "Quay lại đài phun nước gặp cả 2 nhận Loxley Bow"], "requires": ["s2"], "provides": ["sq12"]}, {"id": "sq7", "cat": "Side Quest", "step": "02.5", "name": "SQ 07: Ktjn the Viera (Phần 1)", "loc": "Rabanastre (Muthru Bazaar)", "details": "Lần trả lời tư vấn tâm lý 1 cho cô gái Viera Ktjn.", "subtasks": ["Tìm Ktjn đứng ở Muthru Bazaar", "Chọn đáp án khuyến khích tự tin (Trả lời lần 1)"], "requires": ["s2"], "provides": ["sq7_1"]}, {"id": "s3", "cat": "Story", "step": "03", "name": "Cốt truyện 03: Garamsythe Waterway & Palace", "loc": "Garamsythe Waterway", "details": "Đột nhập Hoàng cung Rabanastre.", "subtasks": ["Gặp Old Dalan ở Lowtown lấy Crescent Stone", "Mở cửa cống ngầm Garamsythe Waterway", "Đột nhập kho báu Hoàng cung"], "requires": ["s2"], "provides": ["s3"]}, {"id": "h4", "cat": "Mob Hunt", "step": "03.1", "name": "Hunt 04: Wraith (Rank I)", "loc": "Garamsythe Waterway", "details": "Nhận từ Milha ở Lowtown. Yếu ma thuật Lửa (Fire).", "subtasks": ["Nhận Hunt từ Milha ở Lowtown", "Đến Overflow Cloaca trong kênh ngầm", "Dùng phép Fire tiêu diệt Wraith", "Quay về nhận thưởng từ Milha"], "requires": ["s3"], "provides": ["h4"]}, {"id": "s4", "cat": "Story", "step": "04", "name": "Cốt truyện 04: Royal Escape & Waterway", "loc": "Waterway", "details": "Balthier & Fran gia nhập chính thức. Tháo chạy khỏi ngục.", "subtasks": ["Balthier & Fran gia nhập đội ngũ", "Gặp Vossler trong kênh ngầm", "Đánh hạ Boss Fire Elemental / Bushfire"], "requires": ["s3"], "provides": ["s4"]}, {"id": "s5", "cat": "Story", "step": "05", "name": "Cốt truyện 05: Nalbina Dungeon & Barheim Passage", "loc": "Nalbina / Barheim Passage", "details": "Vượt Barheim Passage thoát ra ngoài sa mạc.", "subtasks": ["Đánh tay đôi ở ngục Nalbina", "Lấy lại trang bị trong kho ngục", "Hạ Boss Mimic Queen ở cuối Barheim Passage"], "requires": ["s4"], "provides": ["s5"]}, {"id": "s6", "cat": "Story", "step": "06", "name": "Cốt truyện 06: Bhujerba & Lhusu Mines", "loc": "Bhujerba / Lhusu Mines", "details": "Đến thành phố bay Bhujerba và mỏ Lhusu Mines.", "subtasks": ["Đáp phi thuyền đến Bhujerba", "Lamont (Larsa) gia nhập party tạm thời", "Đi sâu vào mỏ Lhusu Mines giải cứu Penelo"], "requires": ["s5"], "provides": ["s6"]}, {"id": "sq17", "cat": "Side Quest", "step": "06.0", "name": "SQ 17: Bhujerba Small Package (⚠️ NHẬN NGAY)", "loc": "Bhujerba Aerodrome", "details": "⚠️ ĐẶC BIỆT: Nhận ngay khi vừa đến Bhujerba Aerodrome lần đầu. KHÔNG ĐƯỢC ĐI LEVIATHAN TRƯỚC KHI TRẢ HÀNG!", "subtasks": ["Gặp NPC tại Bhujerba Aerodrome nhận gói hàng", "Mang về giao cho NPC ở Rabanastre Aerodrome (Chạy về giao ngay)"], "missable": true, "requires": ["s6"], "provides": ["sq17"]}, {"id": "h5", "cat": "Mob Hunt", "step": "06.1", "name": "Hunt 05: Nidhogg (Rank I)", "loc": "Lhusu Mines", "details": "⚠️ ĐẶC BIỆT: Hạ Nidhogg rơi ra Great Serpentskin. TUYỆT ĐỐI KHÔNG BÁN VÀO SHOP! Cất kho làm Quest Desert Patient.", "subtasks": ["Nhận Hunt từ Aekom tại bến phi thuyền Bhujerba", "Đến Transit Way 1 tiêu diệt Nidhogg", "Thu thập Great Serpentskin (⚠️ CẤT KHO, KHÔNG BÁN!)", "Báo cáo trả quest cho Aekom"], "missable": true, "requires": ["s6"], "provides": ["great_serpentskin"]}, {"id": "h7", "cat": "Mob Hunt", "step": "06.3", "name": "Hunt 07: Rocktoise (Rank I)", "loc": "Lhusu Mines", "details": "Nhận từ Pilika ở Bhujerba. Dùng phép Blind và Wind/Aero.", "subtasks": ["Nhận Hunt từ Pilika ở Khuba Skyway", "Đến Site 2 Lhusu Mines hạ Rocktoise", "Trở về trả quest cho Pilika"], "requires": ["s6"], "provides": ["h7"]}, {"id": "sq11", "cat": "Side Quest", "step": "06.4", "name": "SQ 11: Pilika's Diary", "loc": "Bhujerba", "details": "Sau khi hạ Rocktoise, lấy nhật ký cho Pilika.", "subtasks": ["Nhận lời nhờ của Pilika đi lấy nhật ký ở Shop Trang Bị", "Tương tác với cuốn nhật ký trên kệ", "Chọn Đọc lén hoặc Không đọc", "Trả lại nhật ký cho Pilika nhận Jade Collar"], "requires": ["h7"], "provides": ["sq11"]}, {"id": "sq8", "cat": "Side Quest", "step": "06.5", "name": "SQ 08: Bhujerban Madhu", "loc": "Bhujerba", "details": "Nhặt và bán 14 chai rượu cao cấp Bhujerban Madhu với giá 1000 Gil/chai.", "subtasks": ["Nhặt đủ 14 chai rượu Bhujerban Madhu", "Bán lại cho 14 cư dân thèm rượu ở Bhujerba (1000 Gil/chai)"], "requires": ["s6"], "provides": ["sq8"]}, {"id": "s7", "cat": "Story", "step": "07", "name": "Cốt truyện 07: Dreadnought Leviathan", "loc": "Leviathan", "details": "Đột nhập chiến hạm Leviathan cứu Công chúa Ashe.", "subtasks": ["Bị bắt lên chiến hạm Leviathan", "Vossler hỗ trợ phá phong ấn ngục", "Giải cứu Công chúa Ashe", "Hạ Boss Judge Ghis"], "requires": ["s6"], "provides": ["s7"]}, {"id": "s8", "cat": "Story", "step": "08", "name": "Cốt truyện 08: Ogir-Yensa & Nam-Yensa Sandsea", "loc": "Nam-Yensa Sandsea", "details": "Băng qua hai biển cát khổng lồ tiến về phía Tây.", "subtasks": ["Vượt qua biển cát Ogir-Yensa Sandsea", "Gặp Urutan-Yensa lấy đồ ăn nhẹ Chocobo", "Băng qua Nam-Yensa Sandsea đến lăng mộ"], "requires": ["s7"], "provides": ["s8"]}, {"id": "h10", "cat": "Mob Hunt", "step": "08.1", "name": "Hunt 10: Wyvern Lord (Rank II)", "loc": "Nam-Yensa Sandsea", "details": "Quái bay trên không. Phải dùng Cung/Súng/Phép để đánh.", "subtasks": ["Nhận Hunt từ Imperial Shadow ở Amanro", "Đến Simoon Bluff hạ Wyvern Lord", "Trở về trả quest"], "requires": ["s8"], "provides": ["h10"]}, {"id": "s9", "cat": "Story", "step": "09", "name": "Cốt truyện 09: Tomb of Raithwall", "loc": "Tomb of Raithwall", "details": "Thu phục Esper Belias. MỞ KHÓA SECOND JOB CHO TOÀN BỘ NHÂN VẬT!", "subtasks": ["Hạ Demon Wall (Bức tường ma)", "Giải câu đố bệ đá trong lăng mộ", "Đánh gục Esper Belias", "Lấy Dawn Shard & mở ô Second Job!"], "requires": ["s8"], "provides": ["s9"]}, {"id": "e1", "cat": "Esper", "step": "09.1", "name": "Esper 01: Belias (The Wielder)", "loc": "Tomb of Raithwall", "details": "Esper Cốt truyện (Hệ Lửa). Mở khóa ô Second Job.", "subtasks": ["Đánh gục Belias tại Tomb of Raithwall", "Gán Esper Belias cho 1 nhân vật để mở Second Job"], "requires": ["s9"], "provides": ["e1"]}, {"id": "sq1", "cat": "Side Quest", "step": "09.2", "name": "SQ 01: Desert Patient (Cứu Người Bệnh Estersand)", "loc": "Estersand", "details": "Giao Cactus Flower, Semclam Shells, Neebra Medic, Valeblossom Dew & Great Serpentskin để lấy Barheim Key và Golden Amulet.", "subtasks": ["1️⃣ Giao Cactus Flower cho Dantro's Wife", "2️⃣ Nhặt 2-5 Semclam Shells bãi sông Nebra giao", "3️⃣ Lấy 2 lọ Neebra Medic từ Dantro mang về", "4️⃣ Đi thuyền sang bờ Bắc hái 1-3 Valeblossom Dew", "5️⃣ ⚠️ GIAO GREAT SERPENTSKIN (Loot Nidhogg)", "6️⃣ Trở lại nói chuyện nhận BARHEIM KEY & Golden Amulet"], "missable": true, "requires": ["cactus_flower", "great_serpentskin", "s9"], "provides": ["barheim_key", "sq1"]}, {"id": "e7", "cat": "Esper", "step": "09.4", "name": "Esper 07: Zalera (The Deathbringer)", "loc": "Barheim Passage", "details": "Dùng Barheim Key từ Quest Desert Patient vào khu vực sâu trong ngục hạ Zalera.", "subtasks": ["Dùng Barheim Key mở cổng ngục Barheim ở Murmuring Calms", "Đi sâu vào khu vực Terminus No. 7", "Đánh hạ Esper Zalera trong vòng 5 phút"], "requires": ["barheim_key"], "provides": ["e7"]}, {"id": "sq2", "cat": "Side Quest", "step": "09.5", "name": "SQ 02: Lost Cactoid (Thuyền Bờ Bắc)", "loc": "Estersand South Bank", "details": "Nói chuyện với Tchigri sang bờ Bắc tìm xương rồng nhỏ rủ về làng để mở tuyến thuyền.", "subtasks": ["Nói chuyện Tchigri & Ruksel ở bến thuyền South Bank", "Đi thuyền sang bờ Bắc gặp gia đình xương rồng", "Đưa con xương rồng nhỏ trở về gặp mẹ ở bờ Nam", "Mở khóa tuyến thuyền tự do đi lại"], "requires": ["s9"], "provides": ["sq2"]}, {"id": "sq6", "cat": "Side Quest", "step": "09.6", "name": "SQ 06: Earth Tyrant (Bão Cát Westsand)", "loc": "Rabanastre Westgate / Westsand", "details": "Gặp Rimzat chế quạt Wind Vane ➔ hạ Earth Tyrant dẹp bão cát.", "subtasks": ["Nói chuyện Rimzat tại Rabanastre Westgate", "Sang Lowtown gặp Cotter lấy thông tin", "Đến Estersand gặp Dantro's Wife lấy Wind Globe", "Giao đồ cho Rimzat nhận Wind Vane", "Mang Wind Vane ra Wyrm's Nest hạ Boss Earth Tyrant"], "requires": ["s9"], "provides": ["sq6"]}, {"id": "h12", "cat": "Mob Hunt", "step": "09.7", "name": "Hunt 12: Ringwyrm (Rank III)", "loc": "Dalmasca Westsand", "details": "Xuất hiện khi Westsand có bão cát (hoặc sau khi hạ Earth Tyrant). Yếu Băng (Blizzard).", "subtasks": ["Nhận Hunt từ Balzac ở Lowtown Rabanastre", "Đến Windtrace Dunes (Dalmasca Westsand) khi có bão cát", "Dùng ma thuật Blizzard tiêu diệt Ringwyrm", "Trở về trả quest cho Balzac"], "requires": ["s9"], "provides": ["h12"]}, {"id": "h6", "cat": "Mob Hunt", "step": "10.1", "name": "Hunt 06: Cluckatrice (Rank I)", "loc": "Giza Plains (Dry/Rains)", "details": "Dọn sạch quái khu vực Gizmunt rồi quay lại để Gà khổng lồ xuất hiện.", "subtasks": ["Nhận Hunt từ Dania ở Nomad Village", "Đến Gizmunt Wall dọn sạch 100% quái vật", "Chuyển zone rồi quay lại tiêu diệt Cluckatrice & 3 gà con", "Nhận thưởng từ Dania"], "requires": ["s9"], "provides": ["cluckatrice_dead"]}, {"id": "sq5", "cat": "Side Quest", "step": "10.2", "name": "SQ 05: Cockatrice Escape (6 Gà Đi Lạc)", "loc": "Toàn thế giới", "details": "Đeo Feather of the Flock tìm 6 con gà Cockatrice đi lạc khắp các thành phố.", "subtasks": ["🐔 Saccio (Lowtown Rabanastre)", "🐔 Agyu (Mt Bur-Omisace)", "🐔 Chit (Eruyt Village)", "🐔 Renn (Port of Balfonheim)", "🐔 Shurry (Imperial Archades)", "🐔 Moomba (Old Archades)"], "requires": ["cluckatrice_dead"], "provides": ["sq5"]}, {"id": "h9", "cat": "Mob Hunt", "step": "10.3", "name": "Hunt 09: Crocadile (Rank II)", "loc": "Giza Plains (Rains)", "details": "Chỉ xuất hiện mùa mưa Giza. Yếu Lửa (Fire).", "subtasks": ["Nhận Hunt từ Sadeen ở Giza Plains", "Đợi Giza chuyển sang MÙA MƯA", "Đến Starfall Field tiêu diệt Crocadile", "Trả quest cho Sadeen"], "requires": ["s9"], "provides": ["h9"]}, {"id": "s10", "cat": "Story", "step": "10", "name": "Cốt truyện 10: Ozmone Plain & Jahara", "loc": "Ozmone Plain / Jahara", "details": "Tiến xuống phía Nam qua Ozmone Plain đến làng người Garif.", "subtasks": ["Băng qua Ozmone Plain", "Đến làng Jahara gặp High Chief", "Larsa gia nhập lại đội ngũ"], "requires": ["s9"], "provides": ["s10"]}, {"id": "h8", "cat": "Mob Hunt", "step": "10.4", "name": "Hunt 08: Enkelados (Rank II)", "loc": "Ozmone Plain", "details": "Nhận từ Low-Chief Zayalu ở Jahara. Dọn quái tộc Wu rồi quay lại.", "subtasks": ["Nhận Hunt từ Low-Chief Zayalu", "Đến The Shred dọn sạch quái tộc Wu", "Chuyển zone quay lại hạ Enkelados", "Trả quest nhận Erase Scroll"], "requires": ["s10"], "provides": ["h8"]}, {"id": "e6", "cat": "Esper", "step": "10.5", "name": "Esper 06: Adrammelech (The Wroth)", "loc": "Zertinan Caverns", "details": "Esper Sét ẩn nằm trong hang Zertinan Caverns (lối vào từ Ozmone Plain).", "subtasks": ["Đến Athroza Quicksands trong Zertinan Caverns", "Tiêu diệt đám quái Skulwyrm quấy rối", "Hạ gục Esper Sét Adrammelech"], "requires": ["s10"], "provides": ["e6"]}, {"id": "s11", "cat": "Story", "step": "11", "name": "Cốt truyện 11: Golmore Jungle & Eruyt Village", "loc": "Golmore Jungle / Eruyt", "details": "Tiến vào rừng rậm Golmore và làng tộc Viera.", "subtasks": ["Tiến vào rừng rậm Golmore Jungle", "Mở đường phong ấn vào làng Eruyt Village", "Đi tìm Mjrn ở Henne Mines", "Hạ Boss Elder Dragon giải phong ấn rừng"], "requires": ["s10"], "provides": ["s11"]}, {"id": "s12", "cat": "Story", "step": "12", "name": "Cốt truyện 12: Paramina Rift & Mt. Bur-Omisace", "loc": "Paramina Rift", "details": "Băng qua vùng núi tuyếtParamina Rift đến Thánh địa Mt. Bur-Omisace.", "subtasks": ["Vượt qua vùng núi tuyết Paramina Rift", "Đến Thánh địa Mt. Bur-Omisace gặp Gran Kiltias Anastasis"], "requires": ["s11"], "provides": ["s12"]}, {"id": "s13", "cat": "Story", "step": "13", "name": "Cốt truyện 13: Stillshrine of Miriam", "loc": "Stillshrine of Miriam", "details": "Đền ngầm Miriam. Thu phục Esper Mateus và đánh hạ Judge Bergan.", "subtasks": ["Trang bị Dawn Shard để mở cổng đền Miriam", "Xoay 3 bức tượng khổng lồ hướng về trung tâm", "Thu phục Esper Mateus", "Trở về Mt. Bur-Omisace đánh hạ Judge Bergan"], "requires": ["s12"], "provides": ["s13"]}, {"id": "e2", "cat": "Esper", "step": "13.1", "name": "Esper 02: Mateus (The Corrupt)", "loc": "Stillshrine of Miriam", "details": "Esper Cốt truyện (Hệ Băng). Hạ đám Ice Azers trước.", "subtasks": ["Đánh hạ đám đệ Ice Azers xung quanh", "Hạ gục Esper Mateus ở tầng sâu đền Miriam"], "requires": ["s13"], "provides": ["e2"]}, {"id": "e10", "cat": "Esper", "step": "13.2", "name": "Esper 10: Zeromus (The Condemner)", "loc": "Stillshrine of Miriam", "details": "Lấy Stone of Condemner từ Kiltian Elder ở Mt Bur-Omisace (sau khi đánh Bergan) ➔ quay lại đền Miriam hạ Zeromus.", "subtasks": ["Nói chuyện Kiltian Elder ở Mt Bur-Omisace lấy Stone of the Condemner", "Đến Ward of the Sword-King trong đền Miriam dùng đá mở cổng", "Hạ gục Esper Zeromus (Trận đấu KHÔNG ĐƯỢC DÙNG MÀU PHÉP - Magic Sealed!)"], "requires": ["s13"], "provides": ["e10"]}, {"id": "s14", "cat": "Story", "step": "14", "name": "Cốt truyện 14: Mosphoran Highwaste & Salikawood", "loc": "Mosphoran / Salikawood", "details": "Đi về phía Bắc Nalbina mở đường sang Salikawood.", "subtasks": ["Băng qua Mosphoran Highwaste", "Hạ Boss King Bomb ở Salikawood", "Sửa cây cầu Salikawood nối sang Phon Coast"], "requires": ["s13"], "provides": ["s14"]}, {"id": "sq10", "cat": "Side Quest", "step": "14.1", "name": "SQ 10: July the Secret Agent", "loc": "Nalbina Town", "details": "Thuê Chocobo dọa 2 tên lính gác cổng Nalbina để giúp điệp viên July thoát ra.", "subtasks": ["Thuê Chocobo tại Nalbina Town", "Cưỡi Chocobo lại gần 2 tên lính gác cổng phía Bắc", "Dọa lính gác bỏ chạy giúp July thoát ra", "Gặp lại July tại shop phép thuật Archades nhận thưởng"], "missable": true, "requires": ["s14"], "provides": ["sq10"]}, {"id": "sq13", "cat": "Side Quest", "step": "14.2", "name": "SQ 13: Jovy the Hero", "loc": "Nalbina Town", "details": "Nói chuyện với chú bé Jovy sau khi hoàn thành các Hunt ở Nalbina.", "subtasks": ["Hoàn thành các Hunt xuất phát từ Nalbina", "Nói chuyện chú bé Jovy chạy quanh thị trấn sau mỗi Hunt", "Nhận thưởng Elixir từ Jovy"], "requires": ["s14"], "provides": ["sq13"]}, {"id": "e9", "cat": "Esper", "step": "14.3", "name": "Esper 09: Exodus (The Judge-Sal)", "loc": "Mosphoran Highwaste", "details": "Mở các đài nước phong ấn ở Babbling Vale để tạo đường lên đỉnh núi hạ Exodus.", "subtasks": ["Kích hoạt các đài nước Shrine of South/West/East Wind", "Cưỡi Chocobo qua đường cây ẩn lên đỉnh Babbling Vale", "Hạ gục Esper Exodus"], "requires": ["s14"], "provides": ["e9"]}, {"id": "h14", "cat": "Mob Hunt", "step": "14.4", "name": "Hunt 14: Encephalartos (Rank III)", "loc": "Salikawood", "details": "Nhận từ Gulamu ở Nalbina. Dọn quái rồi quay lại.", "subtasks": ["Nhận Hunt từ Gulamu ở Nalbina", "Đến The Piebald Path dọn quái", "Tiêu diệt Encephalartos & trả quest"], "requires": ["s14"], "provides": ["h14"]}, {"id": "h15", "cat": "Mob Hunt", "step": "14.5", "name": "Hunt 15: Carrot (Wyrmhero) (Rank VII)", "loc": "Salikawood", "details": "KHÔNG ĐƯỢC ĐÁNH BẤT KỲ CON QUÁI NÀO khi di chuyển từ zone kế bên vào phòng nó.", "subtasks": ["Nhận Hunt từ Zama ở Nalbina", "Di chuyển vào Sun-dappled Path mà KHÔNG ĐÁNH BẤT KỲ QUÁI NÀO", "Hạ gục quái cây Carrot", "Báo cáo Zama nhận thưởng"], "requires": ["s14"], "provides": ["h15"]}, {"id": "s15", "cat": "Story", "step": "15", "name": "Cốt truyện 15: Phon Coast & Tchita Uplands", "loc": "Phon Coast", "details": "Đến bãi biển Phon Coast và trại thợ săn.", "subtasks": ["Đến bãi biển Phon Coast", "Trọ tại Hunter's Camp", "Đi tiếp sang đồng cỏ Tchita Uplands"], "requires": ["s14"], "provides": ["s15"]}, {"id": "sq3", "cat": "Side Quest", "step": "15.1", "name": "SQ 03: Hunt Club (Hội Thợ Săn Phon Coast)", "loc": "Phon Coast", "details": "Nói chuyện với Huntmaster gia nhập hội săn 30 quái hiếm. Chia điểm 16 Stok / 5 Atak / 5 Blok.", "subtasks": ["Gia nhập Hunt Club tại Phon Coast", "Săn 30 con quái hiếm (Trophy Rare Monsters)", "⚠️ CHIA ĐIỂM: 16 cho Stok, 5 cho Atak, 5 cho Blok", "Đổi bộ 3 tối thượng: Zodiac Spear, Zodiac Shield & Genji Gloves!"], "requires": ["s15"], "provides": ["sq3"]}, {"id": "sq14", "cat": "Side Quest", "step": "15.2", "name": "SQ 14: Nebra River Fishing Minigame", "loc": "Estersand South Bank", "details": "Mở minigame câu cá sau khi đến Phon Coast lấy cần câu Matamune.", "subtasks": ["Lấy cần câu Matamune từ Ruksel", "Hoàn thành 5 bãi câu từ dễ đến khó", "Đạt danh hiệu Master Angler lấy Lu-Shang's Badge (nguyên liệu Wyrmhero Blade)"], "requires": ["sq3"], "provides": ["sq14"]}, {"id": "h11", "cat": "Mob Hunt", "step": "15.3", "name": "Hunt 11: White Mousse (Rank V)", "loc": "Garamsythe Waterway", "details": "Nhận chìa khóa Sluice Gate Key để điều chỉnh cống ngầm.", "subtasks": ["Nhận Hunt từ Sorbet ở Rabanastre Westgate", "Đến West Sluiceway hạ White Mousse (yếu Fire)", "Nhận thưởng SLUICE GATE KEY"], "requires": ["s15"], "provides": ["sluice_key"]}, {"id": "e8", "cat": "Esper", "step": "15.4", "name": "Esper 08: Cúchulainn (The Impure)", "loc": "Garamsythe Waterway", "details": "Dùng Sluice Gate Key mở van nước cống ngầm hạ Cúchulainn.", "subtasks": ["Dùng Sluice Gate Key đóng/mở van nước No. 3, 4, 10, 11 theo đúng thứ tự", "Tiến vào No. 1st Cloaca (máu tụt liên tục!)", "Hạ gục Esper Cúchulainn"], "requires": ["sluice_key"], "provides": ["e8"]}, {"id": "h13", "cat": "Mob Hunt", "step": "16.1", "name": "Hunt 13: Marilith (Rank V)", "loc": "Sochen Cave Palace", "details": "Đứng đợi khoảng 5 phút trong phòng Hall of Aspiration.", "subtasks": ["Nhận Hunt tại quán bar Balfonheim", "Vào Hall of Aspiration trong Sochen Cave", "Đứng yên đợi 5 phút cho Marilith bò ra", "Hạ gục rắn khổng lồ Marilith"], "requires": ["s15"], "provides": ["h13"]}, {"id": "s16", "cat": "Story", "step": "16", "name": "Cốt truyện 16: Sochen Cave & Archades", "loc": "Imperial City of Archades", "details": "Tiến vào Đế đô Archades.", "subtasks": ["Vượt qua mê cung Sochen Cave Palace", "Đến Old Archades gặp Jules", "Đi xe taxi lên khu trung tâm Imperial City of Archades"], "requires": ["s15"], "provides": ["s16"]}, {"id": "sq18", "cat": "Side Quest", "step": "16.2", "name": "SQ 18: Archades Sandalwood Chop", "loc": "Archades", "details": "Ghép đôi 28 cặp cư dân tích đủ 28 lá thư Chops lấy vé VIP Sandalwood Chop.", "subtasks": ["Nói chuyện ghép đôi 28 cặp cư dân Archades", "Tích đủ 28 Chops", "Đổi lấy Sandalwood Chop (Vé VIP Taxi)"], "requires": ["s16"], "provides": ["sq18"]}, {"id": "sq4", "cat": "Side Quest", "step": "16.3", "name": "SQ 04: Three Medallions (Giải Phong Ấn Nabudis)", "loc": "Rabanastre/Archades/Salikawood", "details": "Gom 3 mảnh huy hiệu tại Rabanastre/Archades/Salikawood.", "subtasks": ["🧩 Medallion 1 (Rabanastre): Ghép 3 mảnh vỡ từ Dalan, Kytes & Filo", "🧩 Medallion 2 (Archades): Gặp Otto ở Old Archades lấy lại huy hiệu", "🧩 Medallion 3 (Salikawood): Hạ King Bomb gặp Ma'kleou ghép chìa khóa", "🔑 Nhận 3 huy hiệu Medallion of Bravery, Love & Luster"], "requires": ["s16"], "provides": ["three_medallions", "sq4"]}, {"id": "sq22", "cat": "Side Quest", "step": "16.4", "name": "SQ 22: Nabudis Secret Baknamy Merchant", "loc": "Necrohol of Nabudis", "details": "Kiểm tra bức tường ẩn trong phòng Hall of Effulgent Light gọi thương nhân Baknamy.", "subtasks": ["Vào Necrohol of Nabudis", "Kiểm tra góc tường ẩn ở Hall of Effulgent Light", "Gọi thương nhân Baknamy bán phép Esunaga & Ether"], "requires": ["s16"], "provides": ["sq22"]}, {"id": "e11", "cat": "Esper", "step": "16.5", "name": "Esper 11: Chaos (Walker of Wheel)", "loc": "Necrohol of Nabudis", "details": "Dùng 3 huy hiệu từ Quest Three Medallions mở phòng phong ấn hạ Chaos.", "subtasks": ["Dùng Medallions mở 3 cánh cửa phong ấn", "Hạ 2 Boss phụ Humbaba Zealot & Fury", "Tiến vào Cloister of Highborn hạ Esper Wind Chaos (Cấm đánh vật lý - Attack Sealed!)"], "requires": ["three_medallions"], "provides": ["e11"]}, {"id": "s17", "cat": "Story", "step": "17", "name": "Cốt truyện 17: Draklor Laboratory", "loc": "Draklor Laboratory", "details": "Đột nhập phòng thí nghiệm Draklor ở Archades.", "subtasks": ["Đột nhập tháp Draklor Laboratory", "Sử dụng thẻ Keycard chuyển tầng", "Đánh hạ Boss Doctor Cid & Redidas hỗ trợ"], "requires": ["s16"], "provides": ["s17"]}, {"id": "s18", "cat": "Story", "step": "18", "name": "Cốt truyện 18: Port of Balfonheim & Feywood", "loc": "Balfonheim / Feywood", "details": "Đến cảng Balfonheim và tiến vào rừng sương mù Feywood.", "subtasks": ["Đến cảng Balfonheim", "Mở đường phong ấn tiến vào rừng rậm Feywood", "Hạ Boss Rafflesia"], "requires": ["s17"], "provides": ["s18"]}, {"id": "sq19", "cat": "Side Quest", "step": "18.1", "name": "SQ 19: Balfonheim Footrace", "loc": "Port of Balfonheim", "details": "Minigame chạy đua bấm phím với Rikken tại cảng Balfonheim.", "subtasks": ["Nói chuyện Rikken ở bến cảng Balfonheim", "Bấm nút tăng tốc thắng 10 cấp độ đua", "Nhận Pirate Hat & trang bị hiếm"], "requires": ["s18"], "provides": ["sq19"]}, {"id": "h17", "cat": "Mob Hunt", "step": "18.2", "name": "Hunt 17: Behemoth King (Rank VII)", "loc": "Feywood", "details": "Dọn sạch toàn bộ quái ở 2 khu vực Edge of Reason & Ice Field Cleared.", "subtasks": ["Nhận Hunt từ Montblanc", "Dọn SẠCH 100% QUÁI ở Edge of Reason & Ice Field Cleared", "Chuyển zone hạ Behemoth King", "Nhận 250 Triệu Gil thưởng tại Rabanastre Lowtown!"], "requires": ["s18"], "provides": ["h17"]}, {"id": "s19", "cat": "Story", "step": "19", "name": "Cốt truyện 19: Giruvegan & Great Crystal", "loc": "Giruvegan", "details": "Tiến vào thành phố cổ đại Giruvegan & mê cung Great Crystal.", "subtasks": ["Giải mã Illusionary Gates ở Giruvegan", "Hạ Boss Daedalus & Tyrant", "Đột nhập mê cung thủy tinh The Great Crystal"], "requires": ["s18"], "provides": ["s19"]}, {"id": "e3", "cat": "Esper", "step": "19.1", "name": "Esper 03: Shemhazai (The Whisperer)", "loc": "Giruvegan", "details": "Esper Cốt truyện (Hệ Linh Hồn). Đổi kháng thuộc tính liên tục.", "subtasks": ["Đánh gục Shemhazai tại Giruvegan", "Lấy Treaty-Blade từ Ocuria"], "requires": ["s19"], "provides": ["e3"]}, {"id": "e12", "cat": "Esper", "step": "19.2", "name": "Esper 12: Ultima (The High Seraph)", "loc": "The Great Crystal", "details": "Giải mã hệ thống cổng ma thuật Capricorn, Aquarius, Pisces trong Great Crystal tiến vào tâm hạ Ultima.", "subtasks": ["Kích hoạt chuỗi cổng Capricorn, Aquarius, Pisces Gate", "Đến Crystal Peak", "Hạ gục Esper Quang Ultima (Thay đổi Field Effect liên tục)"], "requires": ["s19"], "provides": ["e12"]}, {"id": "sq21", "cat": "Side Quest", "step": "19.3", "name": "SQ 21: Great Crystal Treasures", "loc": "The Great Crystal", "details": "Lấy Excalibur và Zodiac Escutcheon trong rương ẩn tại Great Crystal.", "subtasks": ["Mở cổng Pisces Gate", "Đến rương chứa Excalibur (100% xuất hiện)", "Đến rương chứa Zodiac Escutcheon"], "requires": ["s19"], "provides": ["sq21"]}, {"id": "s20", "cat": "Story", "step": "20", "name": "Cốt truyện 20: Ridorana Cataract & Pharos Lighthouse", "loc": "Pharos Lighthouse", "details": "Chinh phục tháp hải đăng Pharos.", "subtasks": ["Đến đảo Ridorana Cataract", "Leo 100 tầng tháp Pharos First, Second & Third Ascent", "Hạ Boss Judge Ghis, Hydro, Redidas hy sinh"], "requires": ["s19"], "provides": ["s20"]}, {"id": "e4", "cat": "Esper", "step": "20.1", "name": "Esper 04: Hashmal (Bringer of Order)", "loc": "Pharos (Second Ascent)", "details": "Esper Cốt truyện (Hệ Đất). Dùng Float né đòn Đất.", "subtasks": ["Đánh gục Hashmal ở tầng 90 Pharos Second Ascent"], "requires": ["s20"], "provides": ["e4"]}, {"id": "e5", "cat": "Esper", "step": "20.2", "name": "Esper 05: Famfrit (The Dark Cloud)", "loc": "Pharos (Third Ascent)", "details": "Esper Cốt truyện (Hệ Nước). Đấu cùng Doctor Cid ở đỉnh tháp Pharos.", "subtasks": ["Đánh hạ Famfrit & Doctor Cid trên đỉnh tháp Pharos"], "requires": ["s20"], "provides": ["e5"]}, {"id": "h16", "cat": "Mob Hunt", "step": "20.3", "name": "Hunt 16: Gilgamesh & Enkidu (Rank VII)", "loc": "Lhusu Mines (Site 7)", "details": "⚠️ TRỘM BỘ GENJI TRƯỚC KHỊ HẠ BOSS! Đấu 2 trận tại Lhusu Mines.", "subtasks": ["⚔️ Trận 1 (Tasche Span): Steal Genji Shield (HP < 40%) & Genji Gauntlets (HP < 20%)", "⚔️ Trận 2 (Site 7): Steal Genji Armor (HP < 40%) & Genji Helm (HP < 20%)", "Hạ gục Gilgamesh & Enkidu nhận Masamune!"], "missable": true, "requires": ["s20"], "provides": ["genji_gear"]}, {"id": "e13", "cat": "Esper", "step": "20.5", "name": "Esper 13: Zodiark (Keeper of Precepts)", "loc": "Henne Mines", "details": "Cần thu phục đủ 10 Esper khác ➔ nói chuyện Geomancer Yugelu ở Jahara mở lối vào Special Charter Shaft Henne Mines.", "subtasks": ["Thu phục đủ ít nhất 10 Esper bất kỳ", "Gặp Geomancer Yugelu ở Jahara để mở cổng Henne Mines", "Đi đến Special Charter Shaft", "Hạ Esper Tối Cường Zodiark (Chú ý đòn Dark Eclipse 100% K.O)"], "requires_espers": 10, "provides": ["e13"]}, {"id": "sq15", "cat": "Side Quest", "step": "20.6", "name": "SQ 15: Wyrm Philosopher & Hell Wyrm", "loc": "Sochen Cave Palace", "details": "Hạ Hunt Vyraal lấy Dragon Scale ➔ đố chữ Windmill #10 ➔ mở Door of Hours hạ Hell Wyrm (5 Triệu HP).", "subtasks": ["Hạ Hunt Vyraal lấy Dragon Scale", "Đưa Dragon Scale cho nhà triết học ở Windmill #10 Tchita Uplands nhận Ageworn Key", "Đến Sochen Cave Palace mở Door of Hours", "Khai chiến & hạ gục Super Boss Hell Wyrm (5 Triệu HP)"], "requires": ["s20"], "provides": ["sq15"]}, {"id": "sq20", "cat": "Side Quest", "step": "20.7", "name": "SQ 20: The Sun-Crest & Moon-Crest", "loc": "Royal Palace / Estersand", "details": "Nhặt Sun Crest (rương Royal Palace) và Moon Crest (Estersand).", "subtasks": ["Mở rương chứa Sun Crest ở kho Royal Palace", "Mở rương chứa Moon Crest ở bãi biển Estersand", "Kết hợp với Godslayer Badge & Lu-Shang's Badge chế Wyrmhero Blade!"], "requires": ["s20"], "provides": ["sq20"]}, {"id": "h18", "cat": "Mob Hunt", "step": "20.8", "name": "Hunt 18: Yiazmat (Rank VII)", "loc": "Ridorana Cataract", "details": "SUPER BOSS KHỦNG NHẤT GAME (50 Triệu HP). Mở khóa sau khi hạ sạch các Hunt khác.", "subtasks": ["Hoàn thành TOÀN BỘ 44 Mob Hunts khác", "Đến Colosseum ở Ridorana Cataract", "Đánh gục SUPER BOSS Yiazmat (50 Triệu HP - 50 thanh máu!)", "Nhận Godslayer Badge từ Montblanc"], "requires": ["s20"], "provides": ["h18"]}, {"id": "s21", "cat": "Story", "step": "21", "name": "Cốt truyện 21: Sky Fortress Bahamut (FINAL)", "loc": "Sky Fortress Bahamut", "details": "⚠️ POINT OF NO RETURN. Trận chiến cuối cùng!", "subtasks": ["Đáp phi thuyền lên Sky Fortress Bahamut", "Hạ Gabranth & Vaynard", "Đánh gục Trùm Cuối Vayne Novus / The Undying ➔ ĐẢO PHÁ GAME 100%!"], "requires": ["s20"], "provides": ["s21"]}];
         
-        if (Object.keys(userDone).length === 0) {
-            userDone = JSON.parse(localStorage.getItem('ffxii_done_items') || '{}');
-            userSubtasks = JSON.parse(localStorage.getItem('ffxii_subtasks_items') || '{}');
-            userProvided = JSON.parse(localStorage.getItem('ffxii_provided_items') || '{}');
-        }
-        
-        renderTimeline();
-        updateProgress();
-    }
+        const GIST_ID = 'fa2bcffba4861b5f8edfde9db3fdf23f';
+        const GITHUB_TOKEN = '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';
 
-    async function saveData() {
-        localStorage.setItem('ffxii_provided_items', JSON.stringify(userProvided));
-        localStorage.setItem('ffxii_done_items', JSON.stringify(userDone));
-        localStorage.setItem('ffxii_subtasks_items', JSON.stringify(userSubtasks));
-        updateProgress();
+        let currentTab = 'all';
+        let userProvided = {};
+        let userDone = {};
+        let userSubtasks = {};
 
-        try {
-            await fetch(`[https://api.github.com/gists/$](https://api.github.com/gists/$){GIST_ID}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    files: {
-                        "ffxii-save.json": {
-                            content: JSON.stringify({
-                                done: userDone,
-                                subtasks: userSubtasks,
-                                provided: userProvided
-                            })
-                        }
+        async function loadCloudData() {
+            try {
+                let response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
                     }
-                })
-            });
-        } catch (e) {
-            console.log("Lỗi đồng bộ lên GitHub Cloud.", e);
+                });
+                if (response.ok) {
+                    let data = await response.json();
+                    if (data.files && data.files['ffxii-save.json']) {
+                        let content = JSON.parse(data.files['ffxii-save.json'].content);
+                        userDone = content.done || {};
+                        userSubtasks = content.subtasks || {};
+                        userProvided = content.provided || {};
+                    }
+                }
+            } catch (e) {
+                console.log("Không thể kết nối GitHub Cloud, tải dữ liệu từ bộ nhớ đệm local.", e);
+            }
+            
+            if (Object.keys(userDone).length === 0) {
+                userDone = JSON.parse(localStorage.getItem('ffxii_done_items') || '{}');
+                userSubtasks = JSON.parse(localStorage.getItem('ffxii_subtasks_items') || '{}');
+                userProvided = JSON.parse(localStorage.getItem('ffxii_provided_items') || '{}');
+            }
+            
+            renderTimeline();
+            updateProgress();
         }
-    }
 
-    async function manualFetchCloud() {
-        await loadCloudData();
-        alert("✨ Đã tải thành công tiến độ mới nhất từ GitHub Cloud!");
-    }
+        async function saveData() {
+            localStorage.setItem('ffxii_provided_items', JSON.stringify(userProvided));
+            localStorage.setItem('ffxii_done_items', JSON.stringify(userDone));
+            localStorage.setItem('ffxii_subtasks_items', JSON.stringify(userSubtasks));
+            updateProgress();
 
-    function getItemStatus(item) {
-        if (userDone[item.id]) return 'done';
-        if (item.subtasks && item.subtasks.length > 0) {
-            let subDoneCount = 0;
-            item.subtasks.forEach((st, idx) => { if (userSubtasks[`${item.id}_${idx}`]) subDoneCount++; });
-            if (subDoneCount === item.subtasks.length) return 'done';
-            if (subDoneCount > 0) return 'partial';
+            try {
+                await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            "ffxii-save.json": {
+                                content: JSON.stringify({
+                                    done: userDone,
+                                    subtasks: userSubtasks,
+                                    provided: userProvided
+                                })
+                            }
+                        }
+                    })
+                });
+            } catch (e) {
+                console.log("Lỗi đồng bộ lên GitHub Cloud.", e);
+            }
         }
-        if (item.requires_espers) {
-            let espersDoneCount = timelineData.filter(e => e.cat === 'Esper' && userDone[e.id]).length;
-            if (espersDoneCount >= item.requires_espers) return 'ready';
+
+        async function manualFetchCloud() {
+            await loadCloudData();
+            alert("✨ Đã tải thành công tiến độ mới nhất từ GitHub Cloud!");
+        }
+
+        function getItemStatus(item) {
+            if (userDone[item.id]) return 'done';
+            if (item.subtasks && item.subtasks.length > 0) {
+                let subDoneCount = 0;
+                item.subtasks.forEach((st, idx) => { if (userSubtasks[`${item.id}_${idx}`]) subDoneCount++; });
+                if (subDoneCount === item.subtasks.length) return 'done';
+                if (subDoneCount > 0) return 'partial';
+            }
+            if (item.requires_espers) {
+                let espersDoneCount = timelineData.filter(e => e.cat === 'Esper' && userDone[e.id]).length;
+                if (espersDoneCount >= item.requires_espers) return 'ready';
+                return 'locked';
+            }
             return 'locked';
         }
-        return 'locked';
-    }
 
-    function toggleMainComplete(id) {
-        const item = timelineData.find(i => i.id === id);
-        if (!item) return;
-        const newState = !userDone[id];
-        userDone[id] = newState;
-        if (item.subtasks) {
-            item.subtasks.forEach((st, idx) => { userSubtasks[`${item.id}_${idx}`] = newState; });
-        }
-        if (item.provides) item.provides.forEach(p => userProvided[p] = newState);
-        saveData(); renderTimeline();
-    }
-
-    function toggleSubtask(itemId, subtaskIdx) {
-        const key = `${itemId}_${subtaskIdx}`;
-        userSubtasks[key] = !userSubtasks[key];
-        const item = timelineData.find(i => i.id === itemId);
-        if (item && item.subtasks) {
-            let allSubDone = item.subtasks.every((st, idx) => userSubtasks[`${itemId}_${idx}`]);
-            userDone[itemId] = allSubDone;
-            if (item.provides) item.provides.forEach(p => userProvided[p] = allSubDone);
-        }
-        saveData(); renderTimeline();
-    }
-
-    function updateProgress() {
-        let total = timelineData.length;
-        let count = timelineData.filter(item => getItemStatus(item) === 'done').length;
-        let percent = Math.round((count / total) * 100);
-        document.getElementById('progress-text').innerText = `${count} / ${total} (${percent}%)`;
-        document.getElementById('progress-bar').style.width = `${percent}%`;
-    }
-
-    function switchTab(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active'); renderTimeline();
-    }
-
-    function handleSearch() { renderTimeline(); }
-
-    function showItemModal(id) {
-        const item = timelineData.find(i => i.id === id);
-        if (!item) return;
-        const status = getItemStatus(item);
-        document.getElementById('modalTitle').innerText = item.name;
-        document.getElementById('modalBadges').innerHTML = `
-            <span class="badge badge-cat-${item.cat.replace(' ', '')}">${item.cat}</span>
-            ${item.missable ? `<span class="badge badge-cat-Missable">⚠️ Dễ Bỏ Lỡ</span>` : ''}
-            ${status === 'done' ? '<span class="badge badge-cat-SideQuest">🟩 Đã Hoàn Thành</span>' : ''}
-        `;
-        document.getElementById('modalBody').innerHTML = `
-            <p>📍 <b>Vị trí:</b> ${item.loc}</p>
-            <div class="modal-detail-box">
-                <strong>📜 Mô Tả & Chi Tiết:</strong><br>${item.details.replace(/\n/g, '<br>')}
-            </div>`;
-        document.getElementById('modalOverlay').classList.add('active');
-    }
-
-    function openGuideModal() { document.getElementById('guideModalOverlay').classList.add('active'); }
-    function closeGuideModal(e) { if (e.target.id === 'guideModalOverlay') closeGuideModalDirect(); }
-    function closeGuideModalDirect() { document.getElementById('guideModalOverlay').classList.remove('active'); }
-
-    function renderTimeline() {
-        const container = document.getElementById('timelineContent');
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        container.innerHTML = '';
-        const filtered = timelineData.filter(item => {
-            let matchesTab = (currentTab === 'all' || item.cat === currentTab);
-            let matchesSearch = (item.name + ' ' + item.loc + ' ' + item.details).toLowerCase().includes(query);
-            return matchesTab && matchesSearch;
-        });
-
-        filtered.forEach(item => {
-            const status = getItemStatus(item);
-            const itemDiv = document.createElement('div');
-            itemDiv.className = `timeline-item status-${status}`;
-            let subtasksHtml = '';
-            if (item.subtasks && item.subtasks.length > 0) {
-                let listItems = item.subtasks.map((st, idx) => {
-                    let isStDone = !!userSubtasks[`${item.id}_${idx}`];
-                    return `<div class="subtask-item ${isStDone ? 'subtask-done' : ''}">
-                        <input type="checkbox" class="subtask-checkbox" ${isStDone ? 'checked' : ''} onchange="toggleSubtask('${item.id}', ${idx})">
-                        <span>${st}</span>
-                    </div>`;
-                }).join('');
-                subtasksHtml = `<div class="subtasks-box">${listItems}</div>`;
+        function toggleMainComplete(id) {
+            const item = timelineData.find(i => i.id === id);
+            if (!item) return;
+            const newState = !userDone[id];
+            userDone[id] = newState;
+            if (item.subtasks) {
+                item.subtasks.forEach((st, idx) => { userSubtasks[`${item.id}_${idx}`] = newState; });
             }
-            itemDiv.innerHTML = `
-                <div class="timeline-header">
-                    <input type="checkbox" class="custom-checkbox" ${status === 'done' ? 'checked' : ''} onchange="toggleMainComplete('${item.id}')">
-                    <div class="timeline-step-num">#${item.step}</div>
-                    <div class="timeline-title-area">
-                        <div class="timeline-title" onclick="showItemModal('${item.id}')">
-                            ${item.name}
-                            <span class="badge badge-cat-${item.cat.replace(' ', '')}">${item.cat}</span>
-                            ${item.missable ? '<span class="badge badge-cat-Missable">⚠️ Dễ Bỏ Lỡ</span>' : ''}
+            if (item.provides) item.provides.forEach(p => userProvided[p] = newState);
+            saveData(); renderTimeline();
+        }
+
+        function toggleSubtask(itemId, subtaskIdx) {
+            const key = `${itemId}_${subtaskIdx}`;
+            userSubtasks[key] = !userSubtasks[key];
+            const item = timelineData.find(i => i.id === itemId);
+            if (item && item.subtasks) {
+                let allSubDone = item.subtasks.every((st, idx) => userSubtasks[`${itemId}_${idx}`]);
+                userDone[itemId] = allSubDone;
+                if (item.provides) item.provides.forEach(p => userProvided[p] = allSubDone);
+            }
+            saveData(); renderTimeline();
+        }
+
+        function updateProgress() {
+            let total = timelineData.length;
+            let count = timelineData.filter(item => getItemStatus(item) === 'done').length;
+            let percent = Math.round((count / total) * 100);
+            document.getElementById('progress-text').innerText = `${count} / ${total} (${percent}%)`;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active'); renderTimeline();
+        }
+
+        function handleSearch() { renderTimeline(); }
+
+        function showItemModal(id) {
+            const item = timelineData.find(i => i.id === id);
+            if (!item) return;
+            const status = getItemStatus(item);
+            document.getElementById('modalTitle').innerText = item.name;
+            document.getElementById('modalBadges').innerHTML = `
+                <span class="badge badge-cat-${item.cat.replace(' ', '')}">${item.cat}</span>
+                ${item.missable ? `<span class="badge badge-cat-Missable">⚠️ Dễ Bỏ Lỡ</span>` : ''}
+                ${status === 'done' ? '<span class="badge badge-cat-SideQuest">🟩 Đã Hoàn Thành</span>' : ''}
+            `;
+            document.getElementById('modalBody').innerHTML = `
+                <p>📍 <b>Vị trí:</b> ${item.loc}</p>
+                <div class="modal-detail-box">
+                    <strong>📜 Mô Tả & Chi Tiết:</strong><br>${item.details.replace(/\n/g, '<br>')}
+                </div>`;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function openGuideModal() { document.getElementById('guideModalOverlay').classList.add('active'); }
+        function closeGuideModal(e) { if (e.target.id === 'guideModalOverlay') closeGuideModalDirect(); }
+        function closeGuideModalDirect() { document.getElementById('guideModalOverlay').classList.remove('active'); }
+
+        function renderTimeline() {
+            const container = document.getElementById('timelineContent');
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+            const filtered = timelineData.filter(item => {
+                let matchesTab = (currentTab === 'all' || item.cat === currentTab);
+                let matchesSearch = (item.name + ' ' + item.loc + ' ' + item.details).toLowerCase().includes(query);
+                return matchesTab && matchesSearch;
+            });
+
+            filtered.forEach(item => {
+                const status = getItemStatus(item);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `timeline-item status-${status}`;
+                let subtasksHtml = '';
+                if (item.subtasks && item.subtasks.length > 0) {
+                    let listItems = item.subtasks.map((st, idx) => {
+                        let isStDone = !!userSubtasks[`${item.id}_${idx}`];
+                        return `<div class="subtask-item ${isStDone ? 'subtask-done' : ''}">
+                            <input type="checkbox" class="subtask-checkbox" ${isStDone ? 'checked' : ''} onchange="toggleSubtask('${item.id}', ${idx})">
+                            <span>${st}</span>
+                        </div>`;
+                    }).join('');
+                    subtasksHtml = `<div class="subtasks-box">${listItems}</div>`;
+                }
+                itemDiv.innerHTML = `
+                    <div class="timeline-header">
+                        <input type="checkbox" class="custom-checkbox" ${status === 'done' ? 'checked' : ''} onchange="toggleMainComplete('${item.id}')">
+                        <div class="timeline-step-num">#${item.step}</div>
+                        <div class="timeline-title-area">
+                            <div class="timeline-title" onclick="showItemModal('${item.id}')">
+                                ${item.name}
+                                <span class="badge badge-cat-${item.cat.replace(' ', '')}">${item.cat}</span>
+                                ${item.missable ? '<span class="badge badge-cat-Missable">⚠️ Dễ Bỏ Lỡ</span>' : ''}
+                            </div>
+                            <div class="timeline-meta">📍 Vị trí: ${item.loc}</div>
                         </div>
-                        <div class="timeline-meta">📍 Vị trí: ${item.loc}</div>
-                    </div>
-                </div>${subtasksHtml}`;
-            container.appendChild(itemDiv);
-        });
-    }
+                    </div>${subtasksHtml}`;
+                container.appendChild(itemDiv);
+            });
+        }
 
-    function closeModal(e) { if (e.target.id === 'modalOverlay') document.getElementById('modalOverlay').classList.remove('active'); }
-    function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('active'); }
+        function closeModal(e) { if (e.target.id === 'modalOverlay') document.getElementById('modalOverlay').classList.remove('active'); }
+        function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('active'); }
 
-    loadCloudData();
-</script>
+        loadCloudData();
+    </script>
+</body>
+</html>
